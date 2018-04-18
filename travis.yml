@@ -1,0 +1,5 @@
+deploy:
+  provider: firebase
+  token: 1/cmJn8elIuTJrVsiNtGxNsE3slX7IGT1J3IPPi57O-M7fTADyIQSmcrOiLN5rsyUB
+  project: tapau
+  message: "From Travis CI and Github"
