@@ -1,5 +1,9 @@
-deploy:
-  provider: firebase
-  token: 1/cmJn8elIuTJrVsiNtGxNsE3slX7IGT1J3IPPi57O-M7fTADyIQSmcrOiLN5rsyUB
-  project: tapau
-  message: "From Travis CI and Github"
+language: node_js
+node_js:
+  -"4.0"
+script:
+  -echo "Deploying!"
+install:
+  -npm install -g firebase-tools
+after_success:
+  -firebase deploy --token $FIREBASE_TOKEN
