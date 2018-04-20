@@ -11,7 +11,7 @@ import {
   ExpansionPanelSummary
 } from 'material-ui';
 import {
-  Link
+  Link, Redirect
 } from 'react-router-dom';
 import firebase from './firebase';
 import { Icon } from 'material-ui';
@@ -31,6 +31,13 @@ class Home extends Component {
   componentDidMount() {
     this.props.setTitle("Home");
   }
+  componentDidUpdate(){
+    if(this.props.loginuser){
+      this.setState({
+        loginsuccess: true
+      })
+    }
+  }
   handleChange = (e) => {
     this.setState({
       [e.target.id]: e.target.value
@@ -45,7 +52,8 @@ class Home extends Component {
           snackBarBtn: "Okay !!",
           email: '',
           password: '',
-          snackbarIsOpen: !this.state.snackbarIsOpen
+          snackbarIsOpen: !this.state.snackbarIsOpen,
+          loginsuccess: true
         })
       })
       .catch((error) => {
@@ -88,6 +96,9 @@ class Home extends Component {
     })
   }
   render() {
+    if (this.state.loginsuccess) {
+      return <Redirect to={{ pathname: "/" }} />
+    }
     return (
       <div>
         <div style={{ flexGrow: 1 }}>

@@ -116,6 +116,7 @@ class About extends Component {
     })
   }
   render() {
+    console.log(this.props)
     return (
       <div>
         <div style={{ display: "flex", justifyContent: "center", paddingTop: "10px" }}>
