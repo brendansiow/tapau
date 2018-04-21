@@ -5,16 +5,20 @@ import {
     Card,
     CardContent,
     CardActions,
-    Snackbar
+    Snackbar,
+    InputLabel, Select, MenuItem
 } from 'material-ui';
 import firebase from './firebase';
-
+const db = firebase.firestore();
 class Register extends Component {
     constructor(props) {
         super(props)
         this.state = {
             email: '',
             password: '',
+            name: '',
+            accounttype: 'customer',
+            registersuccess: false
         };
     }
     componentDidMount() {
@@ -26,24 +30,37 @@ class Register extends Component {
         })
     }
     handleChange = (e) => {
-        this.setState({
-            [e.target.id]: e.target.value
-        });
+        if (e.target.id) {
+            this.setState({
+                [e.target.id]: e.target.value
+            });
+        } else {
+            this.setState({
+                [e.target.name]: e.target.value
+            });
+        }
     }
     handleRegister = (e) => {
         firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
             .then((user) => {
-                this.setState({
-                    snackBarMsg: "Sign up Successfully !!",
-                    snackBarBtn: "Okay !!",
-                    email: '',
-                    password: '',
-                    snackbarIsOpen: !this.state.snackbarIsOpen
+                db.collection("user").add({
+                    uid: user.uid,
+                    name: this.state.name,
+                    accounttype: this.state.accounttype
+                }).then((doc) => {
+                    this.setState({
+                        snackBarMsg: "Sign up Successfully !!",
+                        snackBarBtn: "Okay !!",
+                        email: '',
+                        password: '',
+                        name: '',
+                        accounttype: 'customer',
+                        snackbarIsOpen: !this.state.snackbarIsOpen,
+                        registersuccess: true
+                    })
                 })
-                this.handleLogout();
-            })
-            .catch((error) => {
-                console.log(error.code);
+            }).catch((error) => {
+                console.log(error);
                 if (error.code === 'auth/invalid-email') {
                     this.setState({
                         snackBarMsg: "Invalid email address !!",
@@ -73,6 +90,14 @@ class Register extends Component {
                     <CardContent>
                         <h2 style={{ margin: "0px", textAlign: "center" }}>Register Form</h2>
                         <TextField
+                            id="name"
+                            label="Name"
+                            margin="normal"
+                            onChange={this.handleChange}
+                            value={this.state.name}
+                            fullWidth
+                        />
+                        <TextField
                             id="email"
                             label="Email"
                             margin="normal"
@@ -90,6 +115,22 @@ class Register extends Component {
                             helperText="Password should contain 6 or more characters!"
                             value={this.state.password}
                         />
+                        <InputLabel htmlFor="accounttype">Account type</InputLabel>
+                        <Select
+                            margin="dense"
+                            id="accounttype"
+                            value={this.state.accounttype}
+                            onChange={this.handleChange}
+                            inputProps={{
+                                name: 'accounttype'
+                            }}
+                            fullWidth
+                        >
+                            <MenuItem value="customer">
+                                Customer
+                            </MenuItem>
+                            <MenuItem value="restaurant">Restaurant</MenuItem>
+                        </Select>
                     </CardContent>
                     <CardActions style={{ display: "flex", justifyContent: "center" }}>
                         <Button variant="raised" style={{ backgroundColor: '#EF5350', color: "white", margin: '10px 10px 0px 0px' }} onClick={this.handleRegister}>Sign up</Button>
@@ -112,7 +153,7 @@ class Register extends Component {
                             {this.state.snackBarBtn}
                         </Button>
                     } />
-            </div>
+            </div >
         );
     }
 }

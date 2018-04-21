@@ -47,8 +47,8 @@ class About extends Component {
             name: doc.data().name,
             feedback: doc.data().feedback
           })
-          this.setState({ feedbackItem: feedbackitem });
         });
+        this.setState({ feedbackItem: feedbackitem });
       });
   }
   handleChange = (e) => {
@@ -58,20 +58,6 @@ class About extends Component {
   }
   handleSubmit = (e) => {
     e.preventDefault();
-    var user = firebase.auth().currentUser;
-    if (user && !user.displayName) {
-      user.updateProfile({
-        displayName: this.state.name,
-      }).then(function () {
-        this.setState({
-          snackBarMsg: "Your name is now set to " + this.state.name + "!!",
-          snackBarBtn: "Okay !!",
-          snackbarIsOpen: !this.state.snackbarIsOpen
-        })
-      }).catch(function (error) {
-        // An error happened.
-      });
-    }
     db.collection("feedback").add({
       name: this.state.name,
       feedback: this.state.feedback
@@ -116,7 +102,6 @@ class About extends Component {
     })
   }
   render() {
-    console.log(this.props)
     return (
       <div>
         <div style={{ display: "flex", justifyContent: "center", paddingTop: "10px" }}>

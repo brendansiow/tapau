@@ -11,12 +11,12 @@ import {
   ExpansionPanelSummary
 } from 'material-ui';
 import {
-  Link, Redirect
+  Link
 } from 'react-router-dom';
 import firebase from './firebase';
 import { Icon } from 'material-ui';
 
-class Home extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -29,14 +29,7 @@ class Home extends Component {
     this.handleRequestClose = this.handleRequestClose.bind(this);
   }
   componentDidMount() {
-    this.props.setTitle("Home");
-  }
-  componentDidUpdate(){
-    if(this.props.loginuser){
-      this.setState({
-        loginsuccess: true
-      })
-    }
+    this.props.setTitle("Login");
   }
   handleChange = (e) => {
     this.setState({
@@ -96,9 +89,6 @@ class Home extends Component {
     })
   }
   render() {
-    if (this.state.loginsuccess) {
-      return <Redirect to={{ pathname: "/" }} />
-    }
     return (
       <div>
         <div style={{ flexGrow: 1 }}>
@@ -174,4 +164,4 @@ class Home extends Component {
   }
 }
 
-export default Home;
+export default Login;

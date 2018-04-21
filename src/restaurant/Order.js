@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 
-class CustHome extends Component {
+class Order extends Component {
     constructor(props){
         super(props);
     }
     componentDidMount() {
-        this.props.setTitle("Home");
+        this.props.setTitle("My Order");
       }
     render() {
         return (
             <div>
-                <h1>Customers Page- Restaurants list</h1>
+                <h1>My Order</h1>
             </div>
         );
     }
 }
 
-export default CustHome;
+export default Order;
