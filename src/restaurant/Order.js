@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 
 class Order extends Component {
-    constructor(props){
-        super(props);
-    }
     componentDidMount() {
         this.props.setTitle("My Order");
       }

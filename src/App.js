@@ -190,19 +190,19 @@ const GuestRoute = ({ component: Component, ...rest }) => (
       )}
   />
 );
-const CustRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={(props) =>
-    rest.loginuser ? [
-      rest.loginuser.accounttype === "customer" ? (
-        <Component key="customer" {...props} {...rest} />
-      ):(
-        <Redirect key="restaurant" to={{ pathname: "/" }} />
-      )
-     ] : (
-      <Redirect to={{ pathname: "/" }} />
-      )
-  } />
- );
+// const CustRoute = ({ component: Component, ...rest }) => (
+//   <Route {...rest} render={(props) =>
+//     rest.loginuser ? [
+//       rest.loginuser.accounttype === "customer" ? (
+//         <Component key="customer" {...props} {...rest} />
+//       ):(
+//         <Redirect key="restaurant" to={{ pathname: "/" }} />
+//       )
+//      ] : (
+//       <Redirect to={{ pathname: "/" }} />
+//       )
+//   } />
+//  );
  const RestRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) =>
     rest.loginuser ? [

@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 
 class RestHome extends Component {
-    constructor(props){
-        super(props);
-    }
     componentDidMount() {
         this.props.setTitle("Home");
       }
