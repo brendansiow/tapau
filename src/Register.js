@@ -18,7 +18,10 @@ class Register extends Component {
             password: '',
             name: '',
             accounttype: 'customer',
-            registersuccess: false
+            restaurantname: '',
+            address: '',
+            contactno: '',
+            website: '',
         };
     }
     componentDidMount() {
@@ -41,22 +44,26 @@ class Register extends Component {
         }
     }
     handleRegister = (e) => {
+        e.preventDefault();
         firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
             .then((user) => {
                 db.collection("user").add({
-                    uid: user.uid,
+                    uid: user.user.uid,
                     name: this.state.name,
                     accounttype: this.state.accounttype
                 }).then((doc) => {
-                    this.setState({
-                        snackBarMsg: "Sign up Successfully !!",
-                        snackBarBtn: "Okay !!",
-                        email: '',
-                        password: '',
-                        name: '',
-                        accounttype: 'customer',
-                        snackbarIsOpen: !this.state.snackbarIsOpen,
-                        registersuccess: true
+                    db.collection("restaurant").add({
+                        uid: user.user.uid,
+                        name: this.state.restaurantname,
+                        address: this.state.address,
+                        contactno: this.state.contactno,
+                        website: this.state.website
+                    }).then((doc) => {
+                        this.setState({
+                            snackBarMsg: "Sign up Successfully !!",
+                            snackBarBtn: "Okay !!",
+                            snackbarIsOpen: !this.state.snackbarIsOpen,
+                        })
                     })
                 })
             }).catch((error) => {
@@ -86,56 +93,105 @@ class Register extends Component {
     render() {
         return (
             <div>
-                <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
-                    <CardContent>
-                        <h2 style={{ margin: "0px", textAlign: "center" }}>Register Form</h2>
-                        <TextField
-                            id="name"
-                            label="Name"
-                            margin="normal"
-                            onChange={this.handleChange}
-                            value={this.state.name}
-                            fullWidth
-                        />
-                        <TextField
-                            id="email"
-                            label="Email"
-                            margin="normal"
-                            onChange={this.handleChange}
-                            value={this.state.email}
-                            fullWidth
-                        />
-                        <TextField
-                            id="password"
-                            label="Password"
-                            type="password"
-                            margin="normal"
-                            fullWidth
-                            onChange={this.handleChange}
-                            helperText="Password should contain 6 or more characters!"
-                            value={this.state.password}
-                        />
-                        <InputLabel htmlFor="accounttype">Account type</InputLabel>
-                        <Select
-                            margin="dense"
-                            id="accounttype"
-                            value={this.state.accounttype}
-                            onChange={this.handleChange}
-                            inputProps={{
-                                name: 'accounttype'
-                            }}
-                            fullWidth
-                        >
-                            <MenuItem value="customer">
-                                Customer
+                <form onSubmit={this.handleRegister}>
+                    <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
+                        <CardContent>
+                            <h2 style={{ margin: "0px", textAlign: "center" }}>Register Form</h2>
+                            <TextField
+                                id="name"
+                                label="Name"
+                                margin="normal"
+                                required
+                                onChange={this.handleChange}
+                                value={this.state.name}
+                                fullWidth
+                            />
+                            <TextField
+                                id="email"
+                                label="Email"
+                                margin="normal"
+                                type="email"
+                                required
+                                onChange={this.handleChange}
+                                value={this.state.email}
+                                fullWidth
+                            />
+                            <TextField
+                                id="password"
+                                label="Password"
+                                type="password"
+                                margin="normal"
+                                required
+                                fullWidth
+                                onChange={this.handleChange}
+                                helperText="Password should contain 6 or more characters!"
+                                value={this.state.password}
+                            />
+                            <InputLabel htmlFor="accounttype">Account type</InputLabel>
+                            <Select
+                                margin="dense"
+                                id="accounttype"
+                                value={this.state.accounttype}
+                                onChange={this.handleChange}
+                                inputProps={{
+                                    name: 'accounttype'
+                                }}
+                                fullWidth
+                            >
+                                <MenuItem value="customer">
+                                    Customer
                             </MenuItem>
-                            <MenuItem value="restaurant">Restaurant</MenuItem>
-                        </Select>
-                    </CardContent>
-                    <CardActions style={{ display: "flex", justifyContent: "center" }}>
-                        <Button variant="raised" style={{ backgroundColor: '#EF5350', color: "white", margin: '10px 10px 0px 0px' }} onClick={this.handleRegister}>Sign up</Button>
-                    </CardActions>
-                </Card>
+                                <MenuItem value="restaurant">Restaurant</MenuItem>
+                            </Select>
+                            {this.state.accounttype === "restaurant" &&
+                                <div>
+                                    <h3 style={{ margin: "10px 0px 0px 0px", textAlign: "center" }}>My Restaurant Profile</h3>
+                                    <TextField
+                                        id="restaurantname"
+                                        label="Restaurant Name"
+                                        margin="normal"
+                                        required
+                                        onChange={this.handleChange}
+                                        value={this.state.restaurantname}
+                                        fullWidth
+                                    />
+                                    <TextField
+                                        id="address"
+                                        label="Address"
+                                        margin="normal"
+                                        required
+                                        multiline
+                                        onChange={this.handleChange}
+                                        value={this.state.address}
+                                        fullWidth
+                                    />
+                                    <TextField
+                                        id="contactno"
+                                        label="Contact Number"
+                                        margin="normal"
+                                        required
+                                        fullWidth
+                                        onChange={this.handleChange}
+                                        helperText="Password should contain 6 or more characters!"
+                                        value={this.state.contactno}
+                                    />
+                                    <TextField
+                                        id="website"
+                                        label="Website / Facebook Page"
+                                        margin="normal"
+                                        required
+                                        fullWidth
+                                        onChange={this.handleChange}
+                                        value={this.state.website}
+                                    />
+                                </div>
+                            }
+                        </CardContent>
+                        <CardActions style={{ display: "flex", justifyContent: "center" }}>
+                            <Button type="submit" variant="raised" style={{ backgroundColor: '#EF5350', color: "white", margin: '10px 10px 0px 0px' }}>Sign up</Button>
+                        </CardActions>
+                    </Card>
+                </form>
                 <Snackbar
                     anchorOrigin={{
                         vertical: 'bottom',
@@ -144,7 +200,7 @@ class Register extends Component {
                     open={this.state.snackbarIsOpen}
                     autoHideDuration={3000}
                     onClose={this.handleRequestClose}
-                    SnackbarContentProps={{
+                    ContentProps={{
                         'aria-describedby': 'message-id',
                     }}
                     message={<span id="message-id">{this.state.snackBarMsg}</span>}

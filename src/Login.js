@@ -102,35 +102,39 @@ class Login extends Component {
           </ExpansionPanel>
         </div>
         {!this.props.loginuser ? (
-          <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
-            <CardContent>
-              <h2 style={{ margin: "0px", textAlign: "center" }}>Login Form</h2>
-              <TextField
-                id="email"
-                label="Email"
-                margin="normal"
-                onChange={this.handleChange}
-                value={this.state.email}
-                fullWidth
-              />
-              <TextField
-                id="password"
-                label="Password"
-                type="password"
-                margin="normal"
-                fullWidth
-                onChange={this.handleChange}
-                helperText="Password should contain 6 or more characters!"
-                value={this.state.password}
-              />
-            </CardContent>
-            <CardActions style={{ display: "flex", justifyContent: "center" }}>
-              <Button variant="raised" style={{ backgroundColor: '#EF5350', color: "white", margin: '10px 10px 0px 0px' }} onClick={this.handleLogin}>Login</Button>
-              <Link to="/register" style={{ textDecoration: "none" }}>
-                <Button variant="raised" style={{ color: '#EF5350', backgroundColor: '#ffffff', margin: '10px 0px 0px 20px' }}>Sign Up</Button>
-              </Link>
-            </CardActions>
-          </Card>
+          <form onSubmit={this.handleLogin}>
+            <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
+              <CardContent>
+                <h2 style={{ margin: "0px", textAlign: "center" }}>Login Form</h2>
+                <TextField
+                  id="email"
+                  label="Email"
+                  margin="normal"
+                  required
+                  onChange={this.handleChange}
+                  value={this.state.email}
+                  fullWidth
+                />
+                <TextField
+                  id="password"
+                  label="Password"
+                  type="password"
+                  margin="normal"
+                  fullWidth
+                  required
+                  onChange={this.handleChange}
+                  helperText="Password should contain 6 or more characters!"
+                  value={this.state.password}
+                />
+              </CardContent>
+              <CardActions style={{ display: "flex", justifyContent: "center" }}>
+                <Button type="submit" variant="raised" style={{ backgroundColor: '#EF5350', color: "white", margin: '10px 10px 0px 0px' }}>Login</Button>
+                <Link to="/register" style={{ textDecoration: "none" }}>
+                  <Button variant="raised" style={{ color: '#EF5350', backgroundColor: '#ffffff', margin: '10px 0px 0px 20px' }}>Sign Up</Button>
+                </Link>
+              </CardActions>
+            </Card>
+          </form>
         ) : (null)}
         {this.props.loginuser ? (
           <div>
@@ -150,7 +154,7 @@ class Login extends Component {
           open={this.state.snackbarIsOpen}
           autoHideDuration={3000}
           onClose={this.handleRequestClose}
-          SnackbarContentProps={{
+          ContentProps={{
             'aria-describedby': 'message-id',
           }}
           message={<span id="message-id">{this.state.snackBarMsg}</span>}

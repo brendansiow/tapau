@@ -5,12 +5,14 @@ import Register from './Register';
 import Order from './restaurant/Order';
 import CustHome from './customer/CustHome';
 import RestHome from './restaurant/RestHome';
+import RestaurantProfile from './restaurant/RestaurantProfile';
 import {
   IconButton, AppBar, Typography, Toolbar, List, Drawer, Divider, ListItem, ListItemText, Icon
 } from 'material-ui';
 import { Route, Link, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import firebase from './firebase';
 const db = firebase.firestore();
+db.settings({timestampsInSnapshots:true});
 class App extends Component {
   constructor(props) {
     super(props);
@@ -114,12 +116,12 @@ class App extends Component {
                         <ListItemText style={{ color: "black", fontSize: "20px" }} primary="Home" disableTypography />
                       </ListItem>
                     </Link>
-                    <Link to="/mytapau" style={{ textDecoration: "none" }}>
+                    <Link to="/cust/mytapau" style={{ textDecoration: "none" }}>
                       <ListItem button>
                         <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Tapau" disableTypography />
                       </ListItem>
                     </Link>
-                    <Link to="/myprofile" style={{ textDecoration: "none" }}>
+                    <Link to="/cust/myprofile" style={{ textDecoration: "none" }}>
                       <ListItem button>
                         <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Profile" disableTypography />
                       </ListItem>
@@ -132,12 +134,12 @@ class App extends Component {
                       <ListItemText style={{ color: "black", fontSize: "20px" }} primary="Home" disableTypography />
                     </ListItem>
                       </Link>
-                    <Link to="/myorder" style={{ textDecoration: "none" }}>
+                    <Link to="/rest/myorder" style={{ textDecoration: "none" }}>
                     <ListItem button>
                       <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Order" disableTypography />
                     </ListItem>
                       </Link>
-                      <Link to="/myrestaurant" style={{ textDecoration: "none" }}>
+                      <Link to="/rest/myrestaurant" style={{ textDecoration: "none" }}>
                       <ListItem button>
                         <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Restaurant" disableTypography />
                       </ListItem>
@@ -161,7 +163,8 @@ class App extends Component {
           <HomeRoute exact path="/" setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <GuestRoute path="/login" component={Login} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <GuestRoute path="/register" component={Register} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
-          <RestRoute path="/myorder" component={Order} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
+          <RestRoute path="/rest/myorder" component={Order} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
+          <RestRoute path="/rest/myrestaurant" component={RestaurantProfile} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <Route path="/about" render={() => <About setTitle={this.setTitle.bind(this)} />} />
         </div>
       </Router>

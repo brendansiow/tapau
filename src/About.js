@@ -168,7 +168,7 @@ class About extends Component {
           open={this.state.snackbarIsOpen}
           autoHideDuration={3000}
           onClose={this.handleRequestClose}
-          SnackbarContentProps={{
+          ContentProps={{
             'aria-describedby': 'message-id',
           }}
           message={<span id="message-id">{this.state.snackBarMsg}</span>}
