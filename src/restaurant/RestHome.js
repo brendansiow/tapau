@@ -6,7 +6,7 @@ class RestHome extends Component {
       }
     render() {
         return (
-            <div>
+            <div style={{paddingTop: "60px"}}>
                 <h1>Restaurant Home Page</h1>
             </div>
         );

@@ -6,7 +6,7 @@ class Order extends Component {
       }
     render() {
         return (
-            <div>
+            <div style={{paddingTop: "60px"}}>
                 <h1>My Order</h1>
             </div>
         );

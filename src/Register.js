@@ -92,7 +92,7 @@ class Register extends Component {
     }
     render() {
         return (
-            <div>
+            <div style={{paddingTop: "60px"}}>
                 <form onSubmit={this.handleRegister}>
                     <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
                         <CardContent>
@@ -161,6 +161,7 @@ class Register extends Component {
                                         margin="normal"
                                         required
                                         multiline
+                                        rows="3"
                                         onChange={this.handleChange}
                                         value={this.state.address}
                                         fullWidth

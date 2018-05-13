@@ -30,7 +30,7 @@ class CustHome extends Component {
     }
     render() {
         return (
-            <div>
+            <div style={{paddingTop: "60px"}}>
                 <h2 style={{ marginTop: "10px", textAlign: "center" }}>Restaurants</h2>
                 {this.state.restaurants.map((item) => {
                     return (

@@ -82,7 +82,7 @@ class App extends Component {
     return (
       <Router>
         <div>
-          <AppBar position="static" style={{ backgroundColor: "#ef5350" }}>
+          <AppBar position="fixed" style={{ backgroundColor: "#ef5350" }}>
             <Toolbar>
               <IconButton style={{ marginLeft: "-12px", marginRight: "20px" }} color="inherit" aria-label="Menu"
                 onClick={() => this.setState({ open: !this.state.open })}>

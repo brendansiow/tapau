@@ -103,7 +103,7 @@ class About extends Component {
   }
   render() {
     return (
-      <div>
+      <div style={{paddingTop: "60px"}}>
         <div style={{ display: "flex", justifyContent: "center", paddingTop: "10px" }}>
           <Button variant="raised"
             onClick={evt => this.setState({
@@ -123,7 +123,7 @@ class About extends Component {
               <TextField required fullWidth multiline label="Your feedback" id="feedback" rows="3" onChange={this.handleChange} value={this.state.feedback} />
             </CardContent>
             <CardActions>
-              <Button type="submit" raised="true" style={{ backgroundColor: '#EF5350', color: "white", width: "-webkit-fill-available" }}>Submit</Button>
+              <Button type="submit" variant="raised" style={{ backgroundColor: '#EF5350', color: "white", width: "-webkit-fill-available" }}>Submit</Button>
             </CardActions>
           </form>
         </Card>

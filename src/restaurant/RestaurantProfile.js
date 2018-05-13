@@ -70,7 +70,7 @@ class RestaurantProfile extends Component {
     }
     render() {
         return (
-            <div>
+            <div style={{paddingTop: "60px"}}>
                 <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
                     <CardContent>
                         <h2 style={{ margin: "0px", textAlign: "center" }}>My Restaurant Profile</h2>
@@ -86,6 +86,7 @@ class RestaurantProfile extends Component {
                             id="address"
                             label="Address"
                             margin="normal"
+                            rows="3"
                             multiline
                             onChange={this.handleChange}
                             value={this.state.address}
