@@ -12,28 +12,24 @@ class RestaurantProfile extends Component {
             address: '',
             contactno: '',
             website: '',
-            documentid: ''
         };
         this.handleUpdate = this.handleUpdate.bind(this);
     }
     componentDidMount() {
         this.props.setTitle("My Restaurant");
-        db.collection("restaurant").where("uid", "==", this.props.loginuser.uid)
-            .get()
-            .then((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
+            db.collection("restaurant").doc(this.props.loginuser.restaurant)
+                .get()
+                .then((doc) => {
                     this.setState({
-                        documentid: doc.id,
                         name: doc.data().name,
                         address: doc.data().address,
                         contactno: doc.data().contactno,
                         website: doc.data().website,
                     })
+                })
+                .catch(function (error) {
+                    console.log("Error getting documents: ", error);
                 });
-            })
-            .catch(function (error) {
-                console.log("Error getting documents: ", error);
-            });
     }
     handleChange = (e) => {
         if (e.target.id) {
@@ -46,13 +42,13 @@ class RestaurantProfile extends Component {
             });
         }
     }
-     handleRequestClose = (e) => {
+    handleRequestClose = (e) => {
         this.setState({
             snackbarIsOpen: false
         })
     }
     handleUpdate() {
-        db.collection("restaurant").doc(this.state.documentid).set({
+        db.collection("restaurant").doc(this.props.loginuser.restaurant).set({
             name: this.state.name,
             address: this.state.address,
             contactno: this.state.contactno,
@@ -70,7 +66,7 @@ class RestaurantProfile extends Component {
     }
     render() {
         return (
-            <div style={{paddingTop: "60px"}}>
+            <div style={{ paddingTop: "60px" }}>
                 <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
                     <CardContent>
                         <h2 style={{ margin: "0px", textAlign: "center" }}>My Restaurant Profile</h2>

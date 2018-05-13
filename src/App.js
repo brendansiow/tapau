@@ -7,12 +7,13 @@ import CustHome from './customer/CustHome';
 import RestHome from './restaurant/RestHome';
 import RestaurantProfile from './restaurant/RestaurantProfile';
 import {
-  IconButton, AppBar, Typography, Toolbar, List, Drawer, Divider, ListItem, ListItemText, Icon
+  IconButton, AppBar, Typography, Toolbar, List, Drawer, Divider, ListItem, ListItemText, Icon,
+  CircularProgress
 } from 'material-ui';
 import { Route, Link, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import firebase from './firebase';
 const db = firebase.firestore();
-db.settings({timestampsInSnapshots:true});
+db.settings({ timestampsInSnapshots: true });
 class App extends Component {
   constructor(props) {
     super(props);
@@ -27,6 +28,7 @@ class App extends Component {
   }
   componentDidMount() {
     firebase.auth().onAuthStateChanged((user) => {
+      //if log in successfully, get user information
       if (user) {
         db.collection("user").where("uid", "==", user.uid)
           .get()
@@ -35,10 +37,25 @@ class App extends Component {
               user["name"] = doc.data().name;
               user["accounttype"] = doc.data().accounttype;
             });
-            this.setState({
-              loginuser: user,
-              isAuthenticating: false
-            })
+            //if user is a restaurant owner, get restaurant id
+            if (user["accounttype"] === "restaurant") {
+              db.collection("restaurant").where("uid", "==", user.uid)
+                .get()
+                .then((querySnapshot) => {
+                  querySnapshot.forEach(function (doc) {
+                    user["restaurant"] = doc.id
+                  });
+                  this.setState({
+                    loginuser: user,
+                    isAuthenticating: false
+                  })
+                })
+            } else {
+              this.setState({
+                loginuser: user,
+                isAuthenticating: false
+              })
+            }
           })
           .catch(function (error) {
             console.log("Error getting documents: ", error);
@@ -74,10 +91,20 @@ class App extends Component {
   }
   render() {
     if (this.state.isAuthenticating) {
-      return null;
+      return (
+        <div style={{ marginTop: '50%', textAlign: 'center' }}>
+          <CircularProgress style={{ color: '#ef5350' }} size={80} thickness={5} />
+          <h2>Patience is a virtue...</h2>
+        </div>
+      )
     }
     if (this.isLoggingOut) {
-      return null;
+      return (
+        <div style={{ marginTop: '50%', textAlign: 'center' }}>
+          <CircularProgress style={{ color: '#ef5350' }} size={80} thickness={5} />
+          <h2>Patience is a virtue...</h2>
+        </div>
+      )
     }
     return (
       <Router>
@@ -109,44 +136,44 @@ class App extends Component {
                     </ListItem>
                   </Link>
                 ) : [
-                  this.state.loginuser.accounttype === "customer" ? (
-                    <div key="customer">
-                    <Link to="/" style={{ textDecoration: "none" }}>
-                      <ListItem button>
-                        <ListItemText style={{ color: "black", fontSize: "20px" }} primary="Home" disableTypography />
-                      </ListItem>
-                    </Link>
-                    <Link to="/cust/mytapau" style={{ textDecoration: "none" }}>
-                      <ListItem button>
-                        <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Tapau" disableTypography />
-                      </ListItem>
-                    </Link>
-                    <Link to="/cust/myprofile" style={{ textDecoration: "none" }}>
-                      <ListItem button>
-                        <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Profile" disableTypography />
-                      </ListItem>
-                    </Link>
-                  </div>
-                  ):(
-                    <div key="restaurant">
-                    <Link to="/" style={{ textDecoration: "none" }}>
-                    <ListItem button>
-                      <ListItemText style={{ color: "black", fontSize: "20px" }} primary="Home" disableTypography />
-                    </ListItem>
-                      </Link>
-                    <Link to="/rest/myorder" style={{ textDecoration: "none" }}>
-                    <ListItem button>
-                      <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Order" disableTypography />
-                    </ListItem>
-                      </Link>
-                      <Link to="/rest/myrestaurant" style={{ textDecoration: "none" }}>
-                      <ListItem button>
-                        <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Restaurant" disableTypography />
-                      </ListItem>
-                    </Link>
-                    </div>
-                  )
-                ]}
+                    this.state.loginuser.accounttype === "customer" ? (
+                      <div key="customer">
+                        <Link to="/" style={{ textDecoration: "none" }}>
+                          <ListItem button>
+                            <ListItemText style={{ color: "black", fontSize: "20px" }} primary="Home" disableTypography />
+                          </ListItem>
+                        </Link>
+                        <Link to="/cust/mytapau" style={{ textDecoration: "none" }}>
+                          <ListItem button>
+                            <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Tapau" disableTypography />
+                          </ListItem>
+                        </Link>
+                        <Link to="/cust/myprofile" style={{ textDecoration: "none" }}>
+                          <ListItem button>
+                            <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Profile" disableTypography />
+                          </ListItem>
+                        </Link>
+                      </div>
+                    ) : (
+                        <div key="restaurant">
+                          <Link to="/" style={{ textDecoration: "none" }}>
+                            <ListItem button>
+                              <ListItemText style={{ color: "black", fontSize: "20px" }} primary="Home" disableTypography />
+                            </ListItem>
+                          </Link>
+                          <Link to="/rest/myorder" style={{ textDecoration: "none" }}>
+                            <ListItem button>
+                              <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Order" disableTypography />
+                            </ListItem>
+                          </Link>
+                          <Link to="/rest/myrestaurant" style={{ textDecoration: "none" }}>
+                            <ListItem button>
+                              <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Restaurant" disableTypography />
+                            </ListItem>
+                          </Link>
+                        </div>
+                      )
+                  ]}
                 <Link to="/about" style={{ textDecoration: "none" }}>
                   <ListItem button>
                     <ListItemText style={{ color: "black", fontSize: "20px" }} primary="About" disableTypography />
@@ -176,10 +203,10 @@ const HomeRoute = ({ ...rest }) => (
     rest.loginuser ? [
       rest.loginuser.accounttype === "customer" ? (
         <CustHome key="custhome" {...props} {...rest} />
-      ):(
-        <RestHome key="resthome" {...props} {...rest} />
-      )
-     ] : (
+      ) : (
+          <RestHome key="resthome" {...props} {...rest} />
+        )
+    ] : (
         <Login {...props} {...rest} />
       )
   } />
@@ -206,17 +233,17 @@ const GuestRoute = ({ component: Component, ...rest }) => (
 //       )
 //   } />
 //  );
- const RestRoute = ({ component: Component, ...rest }) => (
+const RestRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) =>
     rest.loginuser ? [
       rest.loginuser.accounttype === "restaurant" ? (
         <Component key="restaurant" {...props} {...rest} />
-      ):(
-        <Redirect key="customer" to={{ pathname: "/" }} />
-      )
-     ] : (
-      <Redirect to={{ pathname: "/" }} />
+      ) : (
+          <Redirect key="customer" to={{ pathname: "/" }} />
+        )
+    ] : (
+        <Redirect to={{ pathname: "/" }} />
       )
   } />
- );
+);
 export default App;
