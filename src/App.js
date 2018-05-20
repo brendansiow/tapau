@@ -6,9 +6,10 @@ import Order from './restaurant/Order';
 import CustHome from './customer/CustHome';
 import RestHome from './restaurant/RestHome';
 import RestaurantProfile from './restaurant/RestaurantProfile';
+import Menu from './restaurant/Menu'
 import {
   IconButton, AppBar, Typography, Toolbar, List, Drawer, Divider, ListItem, ListItemText, Icon,
-  CircularProgress
+  CircularProgress, Snackbar,Button
 } from 'material-ui';
 import { Route, Link, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import firebase from './firebase';
@@ -23,7 +24,9 @@ class App extends Component {
       title: '',
       isAuthenticating: true,
       isLoggingOut: false,
-      loggedOut: false
+      loggedOut: false,
+      snackbarIsOpen:false,
+      snackBarMsg:''
     };
   }
   componentDidMount() {
@@ -67,12 +70,25 @@ class App extends Component {
         })
       }
     });
+    const msg = firebase.messaging();
+    msg.onMessage(payload => {
+      console.log(payload);
+     this.setState({
+       snackbarIsOpen:true,
+       snackBarMsg:payload.notification.title
+     })
+    });
   }
   setTitle(title) {
     this.setState({
       title: title
     })
   }
+  handleRequestClose = e => {
+    this.setState({
+      snackbarIsOpen: false
+    });
+  };
   handleLogout = (e) => {
     this.setState({
       isLoggingOut: true
@@ -120,6 +136,29 @@ class App extends Component {
               </Typography>
             </Toolbar>
           </AppBar>
+          <Snackbar
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center"
+          }}
+          open={this.state.snackbarIsOpen}
+          onClose={this.handleRequestClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          autoHideDuration={3000}
+          message={<span id="message-id">{this.state.snackBarMsg}</span>}
+          action={
+            <Button
+              key="undo"
+              style={{ color: "#EF5350" }}
+              dense="true"
+              onClick={this.handleRequestClose}
+            >
+              Go
+            </Button>
+          }
+        />
           <Drawer open={this.state.open} onClose={() => this.setState({ open: false })}>
             <div tabIndex={0} role="button" style={{ width: "250px" }}>
               <List style={{ backgroundColor: "#ef5350" }}>
@@ -166,6 +205,11 @@ class App extends Component {
                               <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Order" disableTypography />
                             </ListItem>
                           </Link>
+                          <Link to="/rest/mymenu" style={{ textDecoration: "none" }}>
+                            <ListItem button>
+                              <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Menu" disableTypography />
+                            </ListItem>
+                          </Link>
                           <Link to="/rest/myrestaurant" style={{ textDecoration: "none" }}>
                             <ListItem button>
                               <ListItemText style={{ color: "black", fontSize: "20px" }} primary="My Restaurant" disableTypography />
@@ -191,6 +235,7 @@ class App extends Component {
           <GuestRoute path="/login" component={Login} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <GuestRoute path="/register" component={Register} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <RestRoute path="/rest/myorder" component={Order} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
+          <RestRoute path="/rest/mymenu" component={Menu} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <RestRoute path="/rest/myrestaurant" component={RestaurantProfile} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <Route path="/about" render={() => <About setTitle={this.setTitle.bind(this)} />} />
         </div>
