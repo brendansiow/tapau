@@ -71,6 +71,7 @@ class Menu extends Component {
     });
   };
   createMenu = () => {
+    this.handleClose();
     db
       .collection("menu")
       .add({
@@ -80,7 +81,7 @@ class Menu extends Component {
       })
       .then(doc => {
         this.setState({
-          snackBarMsg: "Menu Created !!",
+          snackBarMsg: "Menu Created !",
           snackBarBtn: "Okay !!",
           open: false,
           snackbarIsOpen: !this.state.snackbarIsOpen,
@@ -107,10 +108,9 @@ class Menu extends Component {
       .delete()
       .then(() => {
         this.setState({
-          snackBarMsg: "Your Menu is deleted !!",
+          snackBarMsg: "Your menu is deleted !",
           snackBarBtn: "Okay !!",
-          snackbarIsOpen: !this.state.snackbarIsOpen,
-          menu: []
+          snackbarIsOpen: !this.state.snackbarIsOpen
         });
       })
       .catch(function(error) {
