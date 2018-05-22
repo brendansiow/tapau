@@ -33,7 +33,8 @@ class Menu extends Component {
       foodname: "",
       foodprice: "",
       snackbarIsOpen: false,
-      menu: []
+      menu: [],
+      selectedMenu:""
     };
   }
   componentDidMount() {
@@ -72,19 +73,20 @@ class Menu extends Component {
   handleClose = () => {
     this.setState({
       open: false,
-      createmenu:""
+      createmenu: ""
     });
   };
-  openAddFoodDialog = () => {
+  openAddFoodDialog = name => event => {
     this.setState({
-      openAddFood: true
+      openAddFood: true,
+      selectedMenu: name
     });
   };
   handleCloseFoodDialog = () => {
     this.setState({
       openAddFood: false,
-      foodname:"",
-      foodprice:""
+      foodname: "",
+      foodprice: ""
     });
   };
   handleRequestClose = e => {
@@ -164,6 +166,17 @@ class Menu extends Component {
   };
   AddFood = e => {
     e.preventDefault();
+    this.handleCloseFoodDialog();
+    db.collection("menu").doc(this.state.selectedMenu).collection("food").add({
+      foodname: this.state.foodname,
+      foodprice:Number(Math.round(this.state.foodprice+'e2')+'e-2').toFixed(2)
+    }).then(()=>{
+      this.setState({
+        snackBarMsg: "Your food is added to the menu !",
+        snackBarBtn: "Okay !!",
+        snackbarIsOpen: !this.state.snackbarIsOpen
+      })
+    })
   };
   render() {
     return (
@@ -208,7 +221,7 @@ class Menu extends Component {
                 <CardContent style={{ paddingTop: "0px" }}>
                   <IconButton
                     style={{ fontSize: "20px" }}
-                    onClick={this.openAddFoodDialog}
+                    onClick={this.openAddFoodDialog(item.id)}
                   >
                     <Icon style={{ color: "#ef5350" }}>add</Icon>
                     Add
@@ -291,7 +304,6 @@ class Menu extends Component {
               />
               <TextField
                 required
-                autoFocus
                 type="number"
                 margin="dense"
                 id="foodprice"
@@ -300,7 +312,9 @@ class Menu extends Component {
                 value={this.state.foodprice}
                 fullWidth
                 InputProps={{
-                  startAdornment: <InputAdornment position="start">RM</InputAdornment>,
+                  startAdornment: (
+                    <InputAdornment position="start">RM</InputAdornment>
+                  )
                 }}
               />
             </DialogContent>
