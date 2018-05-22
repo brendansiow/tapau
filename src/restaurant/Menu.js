@@ -10,11 +10,16 @@ import {
   Snackbar,
   Card,
   CardContent,
-  CardActions,
   Icon,
   CardHeader,
   IconButton,
-  Switch
+  Switch,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  ListItemSecondaryAction,
+  InputAdornment
 } from "material-ui";
 import firebase from "../firebase";
 const db = firebase.firestore();
@@ -24,13 +29,17 @@ class Menu extends Component {
     this.state = {
       open: false,
       createmenu: "",
+      openAddFood: false,
+      foodname: "",
+      foodprice: "",
       snackbarIsOpen: false,
       menu: []
     };
   }
   componentDidMount() {
     this.props.setTitle("My Menu");
-    db.collection("menu")
+    db
+      .collection("menu")
       .where("rid", "==", this.props.loginuser.restaurant)
       .onSnapshot(querySnapshot => {
         var menu = [];
@@ -41,8 +50,8 @@ class Menu extends Component {
             visibility: doc.data().visibility
           });
         });
-         this.setState({ menu: menu })
-      })
+        this.setState({ menu: menu });
+      });
   }
   handleChange = e => {
     if (e.target.id) {
@@ -62,7 +71,20 @@ class Menu extends Component {
   };
   handleClose = () => {
     this.setState({
-      open: false
+      open: false,
+      createmenu:""
+    });
+  };
+  openAddFoodDialog = () => {
+    this.setState({
+      openAddFood: true
+    });
+  };
+  handleCloseFoodDialog = () => {
+    this.setState({
+      openAddFood: false,
+      foodname:"",
+      foodprice:""
     });
   };
   handleRequestClose = e => {
@@ -70,8 +92,9 @@ class Menu extends Component {
       snackbarIsOpen: false
     });
   };
-  createMenu = () => {
+  createMenu = e => {
     this.handleClose();
+    e.preventDefault();
     db
       .collection("menu")
       .add({
@@ -96,10 +119,32 @@ class Menu extends Component {
     var menu = this.state.menu;
     menu.forEach(doc => {
       if (doc.id === name) {
-        doc.visibility = !doc.visibility;
+        db
+          .collection("menu")
+          .doc(name)
+          .update({
+            visibility: !doc.visibility
+          })
+          .then(() => {
+            if (doc.visibility) {
+              this.setState({
+                snackBarMsg: "Your menu is invisible !",
+                snackBarBtn: "Okay !!",
+                snackbarIsOpen: !this.state.snackbarIsOpen
+              });
+            } else {
+              this.setState({
+                snackBarMsg: "Your menu is visible !",
+                snackBarBtn: "Okay !!",
+                snackbarIsOpen: !this.state.snackbarIsOpen
+              });
+            }
+          })
+          .catch(function(error) {
+            console.error("Error editing document: ", error);
+          });
       }
     });
-    this.setState({ menu: menu });
   };
   handleDelete = e => {
     db
@@ -116,6 +161,9 @@ class Menu extends Component {
       .catch(function(error) {
         console.error("Error removing document: ", error);
       });
+  };
+  AddFood = e => {
+    e.preventDefault();
   };
   render() {
     return (
@@ -157,12 +205,33 @@ class Menu extends Component {
                   }
                   title={<h3 style={{ margin: "0" }}>{item.menuname}</h3>}
                 />
-                <CardActions>
-                  <IconButton style={{ marginLeft: "auto",fontSize:"20px" }}>
+                <CardContent style={{ paddingTop: "0px" }}>
+                  <IconButton
+                    style={{ fontSize: "20px" }}
+                    onClick={this.openAddFoodDialog}
+                  >
                     <Icon style={{ color: "#ef5350" }}>add</Icon>
                     Add
                   </IconButton>
-                </CardActions>
+                  <List>
+                    <ListItem button>
+                      <ListItemText primary="Chicken Rice" />
+                      <ListItemSecondaryAction>RM 7.00</ListItemSecondaryAction>
+                    </ListItem>
+                    <Divider />
+                    <ListItem button>
+                      <ListItemText primary="Sizzling noodle" />
+                      <ListItemSecondaryAction>
+                        RM 10.00
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                    <Divider />
+                    <ListItem button>
+                      <ListItemText primary="Pan Mee" />
+                      <ListItemSecondaryAction>RM 9.50</ListItemSecondaryAction>
+                    </ListItem>
+                  </List>
+                </CardContent>
               </Card>
             );
           })
@@ -172,29 +241,78 @@ class Menu extends Component {
           onClose={this.handleClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Create Menu</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Please enter your restaurant menu name :
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="createmenu"
-              label="Menu Name"
-              onChange={this.handleChange}
-              value={this.state.createmenu}
-              fullWidth
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={this.createMenu} color="primary">
-              Create
-            </Button>
-          </DialogActions>
+          <form onSubmit={this.createMenu}>
+            <DialogTitle id="form-dialog-title">Create Menu</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Please enter your restaurant menu name :
+              </DialogContentText>
+              <TextField
+                required
+                autoFocus
+                margin="dense"
+                id="createmenu"
+                label="Menu Name"
+                onChange={this.handleChange}
+                value={this.state.createmenu}
+                fullWidth
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleClose} color="primary">
+                Cancel
+              </Button>
+              <Button type="submit" color="primary">
+                Create
+              </Button>
+            </DialogActions>
+          </form>
+        </Dialog>
+        <Dialog
+          open={this.state.openAddFood}
+          onClose={this.handleCloseFoodDialog}
+          aria-labelledby="form-dialog-title"
+        >
+          <form onSubmit={this.AddFood}>
+            <DialogTitle id="form-dialog-title">Add Food to Menu</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Please enter your food details :
+              </DialogContentText>
+              <TextField
+                required
+                autoFocus
+                margin="dense"
+                id="foodname"
+                label="Food Name"
+                onChange={this.handleChange}
+                value={this.state.foodname}
+                fullWidth
+              />
+              <TextField
+                required
+                autoFocus
+                type="number"
+                margin="dense"
+                id="foodprice"
+                label="Food Price"
+                onChange={this.handleChange}
+                value={this.state.foodprice}
+                fullWidth
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">RM</InputAdornment>,
+                }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleCloseFoodDialog} color="primary">
+                Cancel
+              </Button>
+              <Button type="submit" color="primary">
+                Add
+              </Button>
+            </DialogActions>
+          </form>
         </Dialog>
         <Snackbar
           anchorOrigin={{

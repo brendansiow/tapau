@@ -48,13 +48,12 @@ class RestaurantProfile extends Component {
         })
     }
     handleUpdate() {
-        db.collection("restaurant").doc(this.props.loginuser.restaurant).set({
+        db.collection("restaurant").doc(this.props.loginuser.restaurant).update({
             name: this.state.name,
             address: this.state.address,
             contactno: this.state.contactno,
-            website: this.state.website,
-            uid: this.props.loginuser.uid
-        }).then((doc) => {
+            website: this.state.website
+        }).then(() => {
             this.setState({
                 snackBarMsg: "Restaurant Profile Updated !!",
                 snackBarBtn: "Okay !!",

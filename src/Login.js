@@ -23,7 +23,6 @@ class Login extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
-    this.handleLogout = this.handleLogout.bind(this);
     this.handleRequestClose = this.handleRequestClose.bind(this);
   }
   componentDidMount() {
@@ -72,21 +71,6 @@ class Login extends Component {
         }
       });
   };
-  handleLogout = e => {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        this.setState({
-          snackBarMsg: "Logout Successfully !!",
-          snackBarBtn: "Okay !!",
-          snackbarIsOpen: !this.state.snackbarIsOpen
-        });
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-  };
   handleRequestClose = e => {
     this.setState({
       snackbarIsOpen: false
@@ -110,7 +94,6 @@ class Login extends Component {
             </ExpansionPanelDetails>
           </ExpansionPanel>
         </div>
-        {!this.props.loginuser ? (
           <form onSubmit={this.handleLogin}>
             <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
               <CardContent>
@@ -167,38 +150,6 @@ class Login extends Component {
               </CardActions>
             </Card>
           </form>
-        ) : null}
-        {this.props.loginuser ? (
-          <div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: "10px"
-              }}
-            >
-              <h3 style={{ margin: "0px", textAlign: "center" }}>
-                {" "}
-                You've signed in with {this.props.loginuser.email}{" "}
-              </h3>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: "10px"
-              }}
-            >
-              <Button
-                variant="raised"
-                style={{ backgroundColor: "grey", color: "white" }}
-                onClick={this.handleLogout}
-              >
-                Logout
-              </Button>
-            </div>
-          </div>
-        ) : null}
         <Snackbar
           anchorOrigin={{
             vertical: "bottom",
