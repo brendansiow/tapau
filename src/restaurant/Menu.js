@@ -34,7 +34,7 @@ class Menu extends Component {
       foodprice: "",
       snackbarIsOpen: false,
       menu: [],
-      selectedMenu:""
+      selectedMenu: ""
     };
   }
   componentDidMount() {
@@ -42,14 +42,36 @@ class Menu extends Component {
     db
       .collection("menu")
       .where("rid", "==", this.props.loginuser.restaurant)
-      .onSnapshot(querySnapshot => {
-        var menu = [];
-        querySnapshot.forEach(doc => {
+      .onSnapshot(menus => {
+        var menu = []; // capture each menu
+        menus.forEach(eachmenu => {
+          db
+            .collection("menu")
+            .doc(eachmenu.id)
+            .collection("food")
+            .onSnapshot(foods => {
+              var statemenu = this.state.menu;
+              var foodlist = []; //capture foodlist in each menu
+              foods.forEach(food => {
+                foodlist.push({
+                  foodid: food.id,
+                  foodname: food.data().foodname,
+                  foodprice: food.data().foodprice
+                });
+                statemenu.forEach(eachstatemenu=>{
+                  if(eachstatemenu.id === eachmenu.id){
+                    eachstatemenu["foodlist"] = foodlist;
+                  }
+                })
+              });
+              this.setState({ menu: menu });
+            });
           menu.push({
-            id: doc.id,
-            menuname: doc.data().menuname,
-            visibility: doc.data().visibility
-          });
+            id: eachmenu.id,
+            menuname: eachmenu.data().menuname,
+            visibility: eachmenu.data().visibility,
+            foodlist:[]
+          });    
         });
         this.setState({ menu: menu });
       });
@@ -167,88 +189,89 @@ class Menu extends Component {
   AddFood = e => {
     e.preventDefault();
     this.handleCloseFoodDialog();
-    db.collection("menu").doc(this.state.selectedMenu).collection("food").add({
-      foodname: this.state.foodname,
-      foodprice:Number(Math.round(this.state.foodprice+'e2')+'e-2').toFixed(2)
-    }).then(()=>{
-      this.setState({
-        snackBarMsg: "Your food is added to the menu !",
-        snackBarBtn: "Okay !!",
-        snackbarIsOpen: !this.state.snackbarIsOpen
+    db
+      .collection("menu")
+      .doc(this.state.selectedMenu)
+      .collection("food")
+      .add({
+        foodname: this.state.foodname,
+        foodprice: Number(
+          Math.round(this.state.foodprice + "e2") + "e-2"
+        ).toFixed(2)
       })
-    })
+      .then(() => {
+        this.setState({
+          snackBarMsg: "Your food is added to the menu !",
+          snackBarBtn: "Okay !!",
+          snackbarIsOpen: !this.state.snackbarIsOpen
+        });
+      });
   };
   render() {
     return (
       <div style={{ paddingTop: "60px" }}>
-        {this.state.menu.length === 0 ? (
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <Button
-              variant="raised"
-              style={{
-                backgroundColor: "#EF5350",
-                color: "white",
-                margin: "10px 10px 0px 0px"
-              }}
-              onClick={this.openDialog}
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="raised"
+            style={{
+              backgroundColor: "#EF5350",
+              color: "white",
+              margin: "10px 10px 0px 0px"
+            }}
+            onClick={this.openDialog}
+          >
+            Create Menu
+          </Button>
+        </div>
+        {this.state.menu.map(item => {
+          return (
+            <Card
+              raised
+              style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}
+              key={item.id}
             >
-              Create Menu
-            </Button>
-          </div>
-        ) : (
-          this.state.menu.map(item => {
-            return (
-              <Card
-                raised
-                style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}
-                key={item.id}
-              >
-                <CardHeader
-                  action={
-                    <div>
-                      <Switch
-                        checked={item.visibility}
-                        value={item.id}
-                        onChange={this.handleCheck(item.id)}
-                      />
-                      <IconButton onClick={() => this.handleDelete(item.id)}>
-                        <Icon style={{ color: "#ef5350" }}>delete</Icon>
-                      </IconButton>
-                    </div>
-                  }
-                  title={<h3 style={{ margin: "0" }}>{item.menuname}</h3>}
-                />
-                <CardContent style={{ paddingTop: "0px" }}>
-                  <IconButton
-                    style={{ fontSize: "20px" }}
-                    onClick={this.openAddFoodDialog(item.id)}
-                  >
-                    <Icon style={{ color: "#ef5350" }}>add</Icon>
-                    Add
-                  </IconButton>
-                  <List>
-                    <ListItem button>
-                      <ListItemText primary="Chicken Rice" />
-                      <ListItemSecondaryAction>RM 7.00</ListItemSecondaryAction>
-                    </ListItem>
-                    <Divider />
-                    <ListItem button>
-                      <ListItemText primary="Sizzling noodle" />
-                      <ListItemSecondaryAction>
-                        RM 10.00
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <Divider />
-                    <ListItem button>
-                      <ListItemText primary="Pan Mee" />
-                      <ListItemSecondaryAction>RM 9.50</ListItemSecondaryAction>
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-            );
-          })
-        )}
+              <CardHeader
+                action={
+                  <div>
+                    <Switch
+                      checked={item.visibility}
+                      value={item.id}
+                      onChange={this.handleCheck(item.id)}
+                    />
+                    <IconButton onClick={() => this.handleDelete(item.id)}>
+                      <Icon style={{ color: "#ef5350" }}>delete</Icon>
+                    </IconButton>
+                  </div>
+                }
+                title={<h3 style={{ margin: "0" }}>{item.menuname}</h3>}
+              />
+              <CardContent style={{ paddingTop: "0px" }}>
+                <IconButton
+                  style={{ fontSize: "20px" }}
+                  onClick={this.openAddFoodDialog(item.id)}
+                >
+                  <Icon style={{ color: "#ef5350" }}>add</Icon>
+                  Add
+                </IconButton>
+                <List>
+                  {item.foodlist.map(food => {
+                    return (
+                      <div key={food.foodid}>
+                        <ListItem button>
+                          <ListItemText primary={food.foodname} />
+                          <ListItemSecondaryAction>
+                            {food.foodprice}
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                        <Divider />
+                      </div>
+                    )
+                  })}
+                </List>
+              </CardContent>
+            </Card>
+          );
+        })}
         <Dialog
           open={this.state.open}
           onClose={this.handleClose}

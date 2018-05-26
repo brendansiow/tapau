@@ -7,6 +7,8 @@ import CustHome from './customer/CustHome';
 import RestHome from './restaurant/RestHome';
 import RestaurantProfile from './restaurant/RestaurantProfile';
 import Menu from './restaurant/Menu'
+import Tapau from './customer/Tapau'
+import CustProfile from './customer/CustProfile'
 import {
   IconButton, AppBar, Typography, Toolbar, List, Drawer, Divider, ListItem, ListItemText, Icon,
   CircularProgress, Snackbar,Button
@@ -234,6 +236,8 @@ class App extends Component {
           <HomeRoute exact path="/" setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <GuestRoute path="/login" component={Login} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <GuestRoute path="/register" component={Register} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
+          <CustRoute path="/cust/mytapau" component={Tapau} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
+          <CustRoute path="/cust/myprofile" component={CustProfile} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <RestRoute path="/rest/myorder" component={Order} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <RestRoute path="/rest/mymenu" component={Menu} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <RestRoute path="/rest/myrestaurant" component={RestaurantProfile} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
@@ -265,19 +269,19 @@ const GuestRoute = ({ component: Component, ...rest }) => (
       )}
   />
 );
-// const CustRoute = ({ component: Component, ...rest }) => (
-//   <Route {...rest} render={(props) =>
-//     rest.loginuser ? [
-//       rest.loginuser.accounttype === "customer" ? (
-//         <Component key="customer" {...props} {...rest} />
-//       ):(
-//         <Redirect key="restaurant" to={{ pathname: "/" }} />
-//       )
-//      ] : (
-//       <Redirect to={{ pathname: "/" }} />
-//       )
-//   } />
-//  );
+const CustRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={(props) =>
+    rest.loginuser ? [
+      rest.loginuser.accounttype === "customer" ? (
+        <Component key="customer" {...props} {...rest} />
+      ):(
+        <Redirect key="restaurant" to={{ pathname: "/" }} />
+      )
+     ] : (
+      <Redirect to={{ pathname: "/" }} />
+      )
+  } />
+ );
 const RestRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) =>
     rest.loginuser ? [

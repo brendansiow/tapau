@@ -29,16 +29,16 @@ class CustHome extends Component {
     return (
       <div style={{ paddingTop: "60px" }}>
         <h2 style={{ marginTop: "10px", textAlign: "center" }}>Restaurants</h2>
-        {this.state.restaurants.map(item => {
+        {this.state.restaurants.map(rest => {
           return (
             <Card
               raised
               style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}
-              key={item.id}
+              key={rest.id}
             >
               <CardContent>
-                <h3 style={{ marginTop: "10px" }}>{item.name}</h3>
-                {item.address}
+                <h3 style={{ marginTop: "10px" }}>{rest.name}</h3>
+                {rest.address}
               </CardContent>
               <CardActions
                 style={{ display: "flex", justifyContent: "flex-end" }}

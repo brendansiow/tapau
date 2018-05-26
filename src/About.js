@@ -50,7 +50,7 @@ class About extends Component {
           });
         });
         this.setState({ feedbackItem: feedbackitem });
-      });
+      });   
   }
   handleChange = e => {
     this.setState({
