@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { CardContent, Card, CardActions, Icon, Button } from "material-ui";
+import { Link } from "react-router-dom";
 import firebase from "../firebase";
 const db = firebase.firestore();
 class CustHome extends Component {
@@ -43,10 +44,12 @@ class CustHome extends Component {
               <CardActions
                 style={{ display: "flex", justifyContent: "flex-end" }}
               >
-                <Button style={{ color: "#ef5350" }}>
-                  View Food Menu
-                  <Icon style={{ color: "#ef5350" }}>chevron_right</Icon>
-                </Button>
+              <Link to={`/cust/restmenu/${rest.id}`}  style={{ textDecoration: "none" }}>
+                  <Button style={{ color: "#ef5350" }}>
+                    View Food Menu
+                    <Icon style={{ color: "#ef5350" }}>chevron_right</Icon>
+                  </Button>
+                </Link>
               </CardActions>
             </Card>
           );

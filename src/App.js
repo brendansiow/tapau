@@ -9,6 +9,7 @@ import RestaurantProfile from './restaurant/RestaurantProfile';
 import Menu from './restaurant/Menu'
 import Tapau from './customer/Tapau'
 import CustProfile from './customer/CustProfile'
+import ViewRest from './customer/ViewRest'
 import {
   IconButton, AppBar, Typography, Toolbar, List, Drawer, Divider, ListItem, ListItemText, Icon,
   CircularProgress, Snackbar,Button
@@ -133,7 +134,8 @@ class App extends Component {
                 onClick={() => this.setState({ open: !this.state.open })}>
                 <Icon>menu</Icon>
               </IconButton>
-              <Typography variant="title" color="inherit" style={{ flex: "1" }} >
+              <Typography variant="title" color="inherit" style={{ flex: "1", overflow: "hidden", 
+              textOverflow: "ellipsis", whiteSpace:"nowrap"}}>
                 {this.state.title}
               </Typography>
             </Toolbar>
@@ -236,6 +238,7 @@ class App extends Component {
           <HomeRoute exact path="/" setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <GuestRoute path="/login" component={Login} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <GuestRoute path="/register" component={Register} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
+          <CustRoute path="/cust/restmenu/:restid" component={ViewRest} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser}/>
           <CustRoute path="/cust/mytapau" component={Tapau} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <CustRoute path="/cust/myprofile" component={CustProfile} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <RestRoute path="/rest/myorder" component={Order} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
