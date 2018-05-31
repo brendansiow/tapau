@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { CardContent, Card, CardActions, Icon, Button } from "material-ui";
+import { CardContent, Card, CardActions, Icon, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import firebase from "../firebase";
 const db = firebase.firestore();

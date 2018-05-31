@@ -20,7 +20,7 @@ import {
   Divider,
   ListItemSecondaryAction,
   InputAdornment
-} from "material-ui";
+} from "@material-ui/core";
 import firebase from "../firebase";
 const db = firebase.firestore();
 class Menu extends Component {
@@ -30,11 +30,14 @@ class Menu extends Component {
       open: false,
       createmenu: "",
       openAddFood: false,
+      openDeleteFood: false,
       foodname: "",
       foodprice: "",
       snackbarIsOpen: false,
       menu: [],
-      selectedMenu: ""
+      selectedMenu: "",
+      foodlist: [],
+      selectedFoodDelete: ""
     };
   }
   componentDidMount() {
@@ -45,35 +48,30 @@ class Menu extends Component {
       .onSnapshot(menus => {
         var menu = []; // capture each menu
         menus.forEach(eachmenu => {
-          db
-            .collection("menu")
-            .doc(eachmenu.id)
-            .collection("food")
-            .onSnapshot(foods => {
-              var statemenu = this.state.menu;
-              var foodlist = []; //capture foodlist in each menu
-              foods.forEach(food => {
-                foodlist.push({
-                  foodid: food.id,
-                  foodname: food.data().foodname,
-                  foodprice: food.data().foodprice
-                });
-                statemenu.forEach(eachstatemenu=>{
-                  if(eachstatemenu.id === eachmenu.id){
-                    eachstatemenu["foodlist"] = foodlist;
-                  }
-                })
-              });
-              this.setState({ menu: menu });
-            });
           menu.push({
             id: eachmenu.id,
             menuname: eachmenu.data().menuname,
             visibility: eachmenu.data().visibility,
-            foodlist:[]
-          });    
+            foodlist: []
+          });
         });
         this.setState({ menu: menu });
+      });
+
+    db
+      .collection("food")
+      .where("rid", "==", this.props.loginuser.restaurant)
+      .onSnapshot(foods => {
+        var foodlist = [];
+        foods.forEach(food => {
+          foodlist.push({
+            foodid: food.id,
+            menuid: food.data().mid,
+            foodname: food.data().foodname,
+            foodprice: food.data().foodprice
+          });
+        });
+        this.setState({ foodlist: foodlist });
       });
   }
   handleChange = e => {
@@ -88,9 +86,17 @@ class Menu extends Component {
     }
   };
   openDialog = () => {
-    this.setState({
-      open: true
-    });
+    if (this.state.menu.length >= 3) {
+      this.setState({
+        snackBarMsg: "You can only have 3 menu!",
+        snackBarBtn: "Okay!!",
+        snackbarIsOpen: !this.state.snackbarIsOpen
+      });
+    } else {
+      this.setState({
+        open: true
+      });
+    }
   };
   handleClose = () => {
     this.setState({
@@ -109,6 +115,17 @@ class Menu extends Component {
       openAddFood: false,
       foodname: "",
       foodprice: ""
+    });
+  };
+  handleOpenDeleteFood = name => event => {
+    this.setState({
+      openDeleteFood: true,
+      selectedFoodDelete: name
+    });
+  };
+  handleCloseDeleteFood = () => {
+    this.setState({
+      openDeleteFood: false
     });
   };
   handleRequestClose = e => {
@@ -190,10 +207,10 @@ class Menu extends Component {
     e.preventDefault();
     this.handleCloseFoodDialog();
     db
-      .collection("menu")
-      .doc(this.state.selectedMenu)
       .collection("food")
       .add({
+        rid: this.props.loginuser.restaurant,
+        mid: this.state.selectedMenu,
         foodname: this.state.foodname,
         foodprice: Number(
           Math.round(this.state.foodprice + "e2") + "e-2"
@@ -205,6 +222,23 @@ class Menu extends Component {
           snackBarBtn: "Okay !!",
           snackbarIsOpen: !this.state.snackbarIsOpen
         });
+      });
+  };
+  DeleteFood = () => {
+    this.handleCloseDeleteFood();
+    db
+      .collection("food")
+      .doc(this.state.selectedFoodDelete)
+      .delete()
+      .then(() => {
+        this.setState({
+          snackBarMsg: "Your food is deleted !",
+          snackBarBtn: "Okay !!",
+          snackbarIsOpen: !this.state.snackbarIsOpen
+        });
+      })
+      .catch(function(error) {
+        console.error("Error removing document: ", error);
       });
   };
   render() {
@@ -254,10 +288,13 @@ class Menu extends Component {
                   Add
                 </IconButton>
                 <List>
-                  {item.foodlist.map(food => {
-                    return (
+                  {this.state.foodlist.map(food => {
+                    return item.id === food.menuid ? (
                       <div key={food.foodid}>
-                        <ListItem button>
+                        <ListItem
+                          button
+                          onClick={this.handleOpenDeleteFood(food.foodid)}
+                        >
                           <ListItemText primary={food.foodname} />
                           <ListItemSecondaryAction>
                             {food.foodprice}
@@ -265,7 +302,7 @@ class Menu extends Component {
                         </ListItem>
                         <Divider />
                       </div>
-                    )
+                    ) : null;
                   })}
                 </List>
               </CardContent>
@@ -350,6 +387,26 @@ class Menu extends Component {
               </Button>
             </DialogActions>
           </form>
+        </Dialog>
+        <Dialog
+          open={this.state.openDeleteFood}
+          onClose={this.handleCloseDeleteFood}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">Delete Food</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to delete this food?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloseDeleteFood} color="primary">
+              Cancel
+            </Button>
+            <Button color="primary" onClick={this.DeleteFood}>
+              Delete
+            </Button>
+          </DialogActions>
         </Dialog>
         <Snackbar
           anchorOrigin={{

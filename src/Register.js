@@ -7,7 +7,7 @@ import {
     CardActions,
     Snackbar,
     InputLabel, Select, MenuItem
-} from 'material-ui';
+} from '@material-ui/core';
 import firebase from './firebase';
 const db = firebase.firestore();
 class Register extends Component {

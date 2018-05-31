@@ -17,7 +17,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions
-} from "material-ui";
+} from "@material-ui/core";
 import firebase from "./firebase";
 const db = firebase.firestore();
 

@@ -8,11 +8,11 @@ import {
   Snackbar,
   ExpansionPanel,
   ExpansionPanelDetails,
-  ExpansionPanelSummary
-} from "material-ui";
+  ExpansionPanelSummary,
+  Icon
+} from "@material-ui/core";
 import { Link } from "react-router-dom";
 import firebase from "./firebase";
-import { Icon } from "material-ui";
 
 class Login extends Component {
   constructor(props) {

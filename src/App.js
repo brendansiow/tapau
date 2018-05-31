@@ -13,7 +13,7 @@ import ViewRest from './customer/ViewRest'
 import {
   IconButton, AppBar, Typography, Toolbar, List, Drawer, Divider, ListItem, ListItemText, Icon,
   CircularProgress, Snackbar,Button
-} from 'material-ui';
+} from '@material-ui/core';
 import { Route, Link, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import firebase from './firebase';
 const db = firebase.firestore();

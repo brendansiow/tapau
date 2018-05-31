@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     CardContent, TextField, Card, CardActions, Button, Snackbar
-} from 'material-ui';
+} from '@material-ui/core';
 import firebase from '../firebase';
 const db = firebase.firestore();
 class RestaurantProfile extends Component {

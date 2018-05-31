@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import QrReader from 'react-qr-reader'
-import { Button, Dialog, DialogContent, DialogTitle } from 'material-ui';
+import { Button, Dialog, DialogContent, DialogTitle } from '@material-ui/core';
 
 class RestHome extends Component {
     constructor(props) {

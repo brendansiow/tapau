@@ -8,7 +8,7 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Divider
-} from "material-ui";
+} from "@material-ui/core";
 import firebase from "../firebase";
 const db = firebase.firestore();
 class ViewRest extends Component {
@@ -16,7 +16,8 @@ class ViewRest extends Component {
     super(props);
     this.state = {
       restaurant: [],
-      menu: []
+      menu: [],
+      foodlist: []
     };
   }
   componentDidMount() {
@@ -38,30 +39,10 @@ class ViewRest extends Component {
     db
       .collection("menu")
       .where("rid", "==", this.props.match.params.restid)
+      .where("visibility","==",true)
       .onSnapshot(menus => {
         var menu = []; // capture each menu
         menus.forEach(eachmenu => {
-          db
-            .collection("menu")
-            .doc(eachmenu.id)
-            .collection("food")
-            .onSnapshot(foods => {
-              var statemenu = this.state.menu;
-              var foodlist = []; //capture foodlist in each menu
-              foods.forEach(food => {
-                foodlist.push({
-                  foodid: food.id,
-                  foodname: food.data().foodname,
-                  foodprice: food.data().foodprice
-                });
-                statemenu.forEach(eachstatemenu => {
-                  if (eachstatemenu.id === eachmenu.id) {
-                    eachstatemenu["foodlist"] = foodlist;
-                  }
-                });
-              });
-              this.setState({ menu: menu });
-            });
           menu.push({
             id: eachmenu.id,
             menuname: eachmenu.data().menuname,
@@ -70,6 +51,22 @@ class ViewRest extends Component {
           });
         });
         this.setState({ menu: menu });
+      });
+
+    db
+      .collection("food")
+      .where("rid", "==", this.props.match.params.restid)
+      .onSnapshot(foods => {
+        var foodlist = [];
+        foods.forEach(food => {
+          foodlist.push({
+            foodid: food.id,
+            menuid: food.data().mid,
+            foodname: food.data().foodname,
+            foodprice: food.data().foodprice
+          });
+        });
+        this.setState({ foodlist: foodlist });
       });
   }
   render() {
@@ -82,13 +79,13 @@ class ViewRest extends Component {
               style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}
               key={item.id}
             >
-              <CardHeader
+            <CardHeader        
                 title={<h3 style={{ margin: "0" }}>{item.menuname}</h3>}
               />
               <CardContent style={{ paddingTop: "0px" }}>
                 <List>
-                  {item.foodlist.map(food => {
-                    return (
+                  {this.state.foodlist.map(food => {
+                    return item.id === food.menuid ? (
                       <div key={food.foodid}>
                         <ListItem button>
                           <ListItemText primary={food.foodname} />
@@ -98,7 +95,7 @@ class ViewRest extends Component {
                         </ListItem>
                         <Divider />
                       </div>
-                    );
+                    ) : null;
                   })}
                 </List>
               </CardContent>
