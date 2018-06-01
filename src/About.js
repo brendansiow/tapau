@@ -38,19 +38,17 @@ class About extends Component {
   }
   componentDidMount() {
     this.props.setTitle("About");
-    db
-      .collection("feedback")
-      .onSnapshot(querySnapshot => {
-        var feedbackitem = [];
-        querySnapshot.forEach(doc => {
-          feedbackitem.push({
-            id: doc.id,
-            name: doc.data().name,
-            feedback: doc.data().feedback
-          });
+    db.collection("feedback").onSnapshot(querySnapshot => {
+      var feedbackitem = [];
+      querySnapshot.forEach(doc => {
+        feedbackitem.push({
+          id: doc.id,
+          name: doc.data().name,
+          feedback: doc.data().feedback
         });
-        this.setState({ feedbackItem: feedbackitem });
-      });   
+      });
+      this.setState({ feedbackItem: feedbackitem });
+    });
   }
   handleChange = e => {
     this.setState({
@@ -241,6 +239,12 @@ class About extends Component {
             </Button>
           }
         />
+        <h2 style={{ textAlign: "center" }}>
+          <Icon style={{ fontSize: "30px", lineHeight: "1.3", color: "grey" }}>
+            code
+          </Icon>{" "}
+          with <Icon style={{lineHeight:"1.3",color:"red"}}>favorite</Icon> by Tapau
+        </h2>
       </div>
     );
   }

@@ -25,7 +25,8 @@ class ViewRest extends Component {
       restaurant: [],
       menu: [],
       foodlist: [],
-      cart: []
+      cart: [],
+      total: "0"
     };
   }
   componentDidMount() {
@@ -78,15 +79,30 @@ class ViewRest extends Component {
   }
   addtoCart = (foodid, foodname, foodprice) => event => {
     var tempcart = this.state.cart;
-    tempcart.push({
-      foodid: foodid,
-      foodname: foodname,
-      foodprice: foodprice
+    var countflag = 0;
+    tempcart.forEach(food => {
+      if (food.foodid === foodid) {
+        food["count"] = food.count + 1;
+        countflag = 1;
+      }
     });
-    console.log(tempcart);
+    if (countflag === 0) {
+      tempcart.push({
+        foodid: foodid,
+        foodname: foodname,
+        foodprice: foodprice,
+        count: 1
+      });
+    }
     this.setState({
-      cart: tempcart
+      cart: tempcart,
+      total: Number(
+        Math.round(
+          parseFloat(this.state.total) + parseFloat(foodprice) + "e2"
+        ) + "e-2"
+      ).toFixed(2)
     });
+    console.log(this.state.cart);
   };
   render() {
     return (
@@ -156,7 +172,7 @@ class ViewRest extends Component {
               </Icon>
             )}
             <h3 style={{ margin: "8px", paddingLeft: "10px" }}>
-              Total : RM 100.00
+              {"Total : RM" + this.state.total}
             </h3>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails
@@ -181,7 +197,7 @@ class ViewRest extends Component {
                           disableTypography
                           primary={food.foodname}
                         />
-                        <ListItemSecondaryAction>
+                        <ListItemSecondaryAction style={{ paddingTop: "12px" }}>
                           {food.foodprice}
                         </ListItemSecondaryAction>
                       </ListItem>
@@ -194,10 +210,10 @@ class ViewRest extends Component {
                       color: "white",
                       margin: "10px 10px 0px 0px"
                     }}
-                    onClick={()=>{
+                    onClick={() => {
                       this.setState({
                         cart: []
-                      })
+                      });
                     }}
                   >
                     Clear Cart
@@ -214,7 +230,7 @@ class ViewRest extends Component {
                   <Button
                     style={{ color: "white", margin: "10px 10px 0px 0px" }}
                   >
-                    Checkout
+                    Order
                     <Icon
                       style={{
                         color: "white",
