@@ -26,7 +26,7 @@ class ViewRest extends Component {
       menu: [],
       foodlist: [],
       cart: [],
-      total: "0"
+      total: "0.00"
     };
   }
   componentDidMount() {
@@ -102,7 +102,9 @@ class ViewRest extends Component {
         ) + "e-2"
       ).toFixed(2)
     });
-    console.log(this.state.cart);
+  };
+  addOrder = () => {
+    console.log("adding an order");
   };
   render() {
     return (
@@ -175,6 +177,7 @@ class ViewRest extends Component {
               {"Total : RM" + this.state.total}
             </h3>
           </ExpansionPanelSummary>
+
           <ExpansionPanelDetails
             style={{
               color: "white",
@@ -185,7 +188,13 @@ class ViewRest extends Component {
           >
             {this.state.cart.length > 0 ? (
               <div>
-                <List style={{ paddingTop: "0px" }}>
+                <List
+                  style={{
+                    paddingTop: "0px",
+                    maxHeight: 200,
+                    overflow: "auto",
+                  }}
+                >
                   {this.state.cart.map(food => {
                     return (
                       <ListItem
@@ -193,10 +202,18 @@ class ViewRest extends Component {
                         style={{ paddingBottom: "0px" }}
                       >
                         <ListItemText
-                          style={{ color: "white" }}
+                          style={{
+                            color: "white",
+                            minWidth: "100px",
+                            flex: "none",
+                            maxWidth: "170px",
+                            textOverflow: "ellipsis",
+                            overflow: "hidden"
+                          }}
                           disableTypography
                           primary={food.foodname}
                         />
+                        <span>{food.count}</span>
                         <ListItemSecondaryAction style={{ paddingTop: "12px" }}>
                           {food.foodprice}
                         </ListItemSecondaryAction>
@@ -212,7 +229,8 @@ class ViewRest extends Component {
                     }}
                     onClick={() => {
                       this.setState({
-                        cart: []
+                        cart: [],
+                        total: 0
                       });
                     }}
                   >
@@ -245,7 +263,11 @@ class ViewRest extends Component {
               </div>
             ) : (
               <h2
-                style={{ margin: "0", paddingTop: "10px", textAlign: "center" }}
+                style={{
+                  margin: "0",
+                  paddingTop: "10px",
+                  textAlign: "center"
+                }}
               >
                 Your cart is empty
               </h2>

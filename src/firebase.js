@@ -11,17 +11,4 @@ const config = {
   messagingSenderId: "177427121610"
 };
 firebase.initializeApp(config);
-const msg = firebase.messaging();
-msg
-  .requestPermission()
-  .then(() => {
-    console.log("have permission");
-    return msg.getToken();
-  })
-  .then(token => {
-    console.log(token);
-  })
-  .catch(err => {
-    console.log(err);
-  });
 export default firebase;

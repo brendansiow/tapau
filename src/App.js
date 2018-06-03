@@ -29,7 +29,8 @@ class App extends Component {
       isLoggingOut: false,
       loggedOut: false,
       snackbarIsOpen:false,
-      snackBarMsg:''
+      snackBarMsg:'',
+      token:''
     };
   }
   componentDidMount() {
@@ -39,9 +40,36 @@ class App extends Component {
         db.collection("user").where("uid", "==", user.uid)
           .get()
           .then((querySnapshot) => {
-            querySnapshot.forEach(function (doc) {
+            querySnapshot.forEach((doc) => {
               user["name"] = doc.data().name;
               user["accounttype"] = doc.data().accounttype;
+              //get and set fcm token
+              const msg = firebase.messaging();
+              msg.requestPermission()
+                .then(() => {
+                  console.log("have permission");
+                  return msg.getToken();
+                })
+                .then((token) => {
+                  this.setState({
+                    token: token
+                  })
+                    var tokenupdate = doc.data().notiToken
+                    if(tokenupdate){
+                     if(!(tokenupdate.indexOf(token)>-1)){
+                      tokenupdate.push(token);
+                     }
+                    }else{
+                        tokenupdate = [];
+                        tokenupdate.push(token);
+                    }
+                    db.collection("user").doc(doc.id).update({
+                        notiToken: tokenupdate
+                    })
+                })
+                .catch(err => {
+                  console.log(err);
+                });
             });
             //if user is a restaurant owner, get restaurant id
             if (user["accounttype"] === "restaurant") {
@@ -97,6 +125,24 @@ class App extends Component {
       isLoggingOut: true
     })
     firebase.auth().signOut().then(() => {
+      // clear token  
+      db.collection("user").where("uid", "==", this.state.loginuser.uid)
+      .get()
+      .then((querySnapshot) => {
+        var tokens=[];
+        var uid ="";
+        querySnapshot.forEach(function (doc) {
+          uid = doc.id;
+          tokens = doc.data().notiToken;
+        })
+        var index = tokens.indexOf(this.state.token);
+        if (index !== -1) {
+            tokens.splice(index, 1);
+        }
+        db.collection("user").doc(uid).update({
+          notiToken: tokens
+        })
+      })
       this.setState({
         snackBarMsg: "Logout Successfully !!",
         snackBarBtn: "Okay !!",
