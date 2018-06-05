@@ -15,6 +15,7 @@ import {
   Button,
   Badge
 } from "@material-ui/core";
+import axios from "axios";
 import firebase from "../firebase";
 const db = firebase.firestore();
 class ViewRest extends Component {
@@ -104,7 +105,54 @@ class ViewRest extends Component {
     });
   };
   addOrder = () => {
-    console.log("adding an order");
+    db.collection("order")
+    .add({
+      "custid":this.props.loginuser.uid,
+      "restid": this.state.restaurant.uid,
+      "foodlist": this.state.cart,
+      "total": this.state.total,
+      "orderTime": firebase.firestore.FieldValue.serverTimestamp(),
+      "acceptedTime":"",
+      "preparedTime":"",
+      "collectTime":""
+    })
+    var notiToken = [];
+    db
+      .collection("user")
+      .where("uid", "==", this.state.restaurant.uid)
+      .get()
+      .then(users => {
+        users.forEach(user => {
+          notiToken = user.data().notiToken;
+          var config = {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
+            }
+          }
+          notiToken.forEach(eachToken=>{
+          axios.post(
+              "https://fcm.googleapis.com/fcm/send",
+              {
+                notification: {
+                  title: "You have a new order!",
+                  body: "From " + this.props.loginuser.name,
+                  icon: "img/logo/logo72.png",
+                  click_action: "https://tapau.tk"
+                },
+                to: eachToken
+              },
+              config
+            )
+            .then(function(response) {
+              console.log(response);
+            })
+            .catch(function(error) {
+              console.log(error);
+            })
+          })
+        });
+      });
   };
   render() {
     return (
@@ -192,7 +240,7 @@ class ViewRest extends Component {
                   style={{
                     paddingTop: "0px",
                     maxHeight: 200,
-                    overflow: "auto",
+                    overflow: "auto"
                   }}
                 >
                   {this.state.cart.map(food => {
@@ -230,7 +278,7 @@ class ViewRest extends Component {
                     onClick={() => {
                       this.setState({
                         cart: [],
-                        total: 0
+                        total: "0.00"
                       });
                     }}
                   >
@@ -247,6 +295,7 @@ class ViewRest extends Component {
                   </Button>
                   <Button
                     style={{ color: "white", margin: "10px 10px 0px 0px" }}
+                    onClick={this.addOrder}
                   >
                     Order
                     <Icon

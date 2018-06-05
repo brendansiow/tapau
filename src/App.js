@@ -54,6 +54,7 @@ class App extends Component {
                   this.setState({
                     token: token
                   })
+                  //update this device token to current logged in user
                     var tokenupdate = doc.data().notiToken
                     if(tokenupdate){
                      if(!(tokenupdate.indexOf(token)>-1)){
@@ -65,6 +66,24 @@ class App extends Component {
                     }
                     db.collection("user").doc(doc.id).update({
                         notiToken: tokenupdate
+                    })
+                    //delete this device token to all of the existing users
+                    db.collection("user")
+                    .get()
+                    .then((allusers) => {
+                      allusers.forEach(eachuser=>{
+                        var notiTokenarr = eachuser.data().notiToken
+                        if(notiTokenarr && (eachuser.data().uid !== user.uid)){
+                        var index = notiTokenarr.indexOf(token);
+                        if (index !== -1) {
+                          notiTokenarr.splice(index, 1);
+                            console.log(notiTokenarr)
+                         }
+                         db.collection("user").doc(eachuser.id).update({
+                           notiToken: notiTokenarr
+                           })
+                          }
+                      })
                     })
                 })
                 .catch(err => {
