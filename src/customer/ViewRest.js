@@ -252,7 +252,7 @@ class ViewRest extends Component {
                         <ListItemText
                           style={{
                             color: "white",
-                            minWidth: "100px",
+                            minWidth: "120px",
                             flex: "none",
                             maxWidth: "170px",
                             textOverflow: "ellipsis",
@@ -261,7 +261,7 @@ class ViewRest extends Component {
                           disableTypography
                           primary={food.foodname}
                         />
-                        <span>{food.count}</span>
+                        <span>x {food.count}</span>
                         <ListItemSecondaryAction style={{ paddingTop: "12px" }}>
                           {food.foodprice}
                         </ListItemSecondaryAction>

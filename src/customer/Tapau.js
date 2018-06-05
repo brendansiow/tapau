@@ -9,7 +9,13 @@ import {
   Stepper,
   Step,
   StepLabel,
-  Tooltip
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Typography,
+  Grid
 } from "@material-ui/core";
 import firebase from "../firebase";
 const db = firebase.firestore();
@@ -79,46 +85,78 @@ class Tapau extends Component {
     switch (index) {
       case 0:
         return (
-          <StepLabel>
-            {label +
-              "\n" +
-              order.orderTime.getHours() +
-              ":" +
-              order.orderTime.getMinutes()}
-          </StepLabel>
+          <Step key={index}>
+            <StepLabel>
+              {label +
+                "\n" +
+                order.orderTime.getHours() +
+                ":" +
+                order.orderTime.getMinutes()}
+            </StepLabel>
+          </Step>
         );
       case 1:
-        return (
-          <StepLabel>
-            {label +
-              "\n" +
-              order.acceptedTime.getHours() +
-              ":" +
-              order.acceptedTime.getMinutes()}
-          </StepLabel>
-        );
+        if (order.acceptedTime) {
+          return (
+            <Step key={index}>
+              <StepLabel>
+                {label +
+                  "\n" +
+                  order.acceptedTime.getHours() +
+                  ":" +
+                  order.acceptedTime.getMinutes()}
+              </StepLabel>
+            </Step>
+          );
+        } else {
+          return (
+            <Step key={index}>
+              <StepLabel>{label + "\n"}</StepLabel>
+            </Step>
+          );
+        }
       case 2:
-        return (
-          <StepLabel>
-            {label +
-              "\n" +
-              order.preparedTime.getHours() +
-              ":" +
-              order.preparedTime.getMinutes()}
-          </StepLabel>
-        );
+        if (order.preparedTime) {
+          return (
+            <Step key={index}>
+              <StepLabel>
+                {label +
+                  "\n" +
+                  order.preparedTime.getHours() +
+                  ":" +
+                  order.preparedTime.getMinutes()}
+              </StepLabel>
+            </Step>
+          );
+        } else {
+          return (
+            <Step key={index}>
+              <StepLabel>{label + "\n"}</StepLabel>
+            </Step>
+          );
+        }
       case 3:
-        return (
-          <StepLabel>
-            {label +
-              "\n" +
-              order.collectTime.getHours() +
-              ":" +
-              order.collectTime.getMinutes()}
-          </StepLabel>
-        );
+        if (order.collecTime) {
+          return (
+            <Step key={index}>
+              <StepLabel>
+                {label +
+                  "\n" +
+                  order.collectTime.getHours() +
+                  ":" +
+                  order.collectTime.getMinutes()}
+              </StepLabel>
+            </Step>
+          );
+        } else {
+          return (
+            <Step key={index}>
+              <StepLabel>{label + "\n"}</StepLabel>
+            </Step>
+          );
+        }
       default:
-        return <div>HI</div>;
+        return <div />;
     }
   };
   render() {
@@ -133,35 +171,84 @@ class Tapau extends Component {
                 </Icon>
               }
             >
-              {order.restname + " "}
-              {order.orderTime.getDate() +
-                "-" +
-                (order.orderTime.getMonth() + 1) +
-                "-" +
-                order.orderTime.getFullYear()}
+              <Grid container spacing={24}>
+                <Grid item xs={12} style={{ paddingBottom: "0" }}>
+                  <Typography variant="title">{order.restname + " "}</Typography>
+                </Grid>
+                <Grid item xs={12} style={{ paddingTop: "0" }}>
+                <Typography variant="subheading">
+                    {" "}
+                    {order.orderTime.getDate() +
+                      "-" +
+                      (order.orderTime.getMonth() + 1) +
+                      "-" +
+                      order.orderTime.getFullYear()}
+                      </Typography>
+                </Grid>
+              </Grid>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
+            <ExpansionPanelDetails
+              style={{
+                display: "block"
+              }}
+            >
               <Stepper
                 style={{ padding: "0" }}
                 activeStep={order.activeStep}
                 alternativeLabel
               >
-                {this.state.steps.map(label => (
-                  <Step key={label}>
-                    <StepLabel>
-                      {label +
-                        "\n" +
-                        order.orderTime.getHours() +
-                        ":" +
-                        order.orderTime.getMinutes()}
-                    </StepLabel> 
-                  </Step>
-                ))}
+                {this.state.steps.map((label, index) =>
+                  this.section(label, order, index)
+                )}
               </Stepper>
+              <h3 style={{ marginBottom: "0" }}>Food Ordered:</h3>
+              <List>
+                {order.foodlist.map(food => (
+                  <div key={food.foodid}>
+                    <ListItem>
+                      <ListItemText
+                        primary={food.foodname}
+                        style={{
+                          minWidth: "120px",
+                          flex: "none",
+                          maxWidth: "170px",
+                          textOverflow: "ellipsis",
+                          overflow: "hidden"
+                        }}
+                      />
+                      <span>x {food.count}</span>
+                      <ListItemSecondaryAction>
+                        {food.foodprice}
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                    <Divider />
+                  </div>
+                ))}
+                <ListItem>
+                  <ListItemText
+                    primary={
+                      <Typography variant="subheading">
+                        Total Amount :
+                      </Typography>
+                    }
+                  />
+                  <ListItemSecondaryAction>
+                    {order.total}
+                  </ListItemSecondaryAction>
+                </ListItem>
+              </List>
             </ExpansionPanelDetails>
             <Divider />
             <ExpansionPanelActions>
-              <div />
+              <Button
+                variant="raised"
+                style={{
+                  backgroundColor: "#EF5350",
+                  color: "white"
+                }}
+              >
+                Collect Order
+              </Button>
             </ExpansionPanelActions>
           </ExpansionPanel>
         ))}
