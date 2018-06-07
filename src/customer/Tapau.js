@@ -28,7 +28,7 @@ class Tapau extends Component {
         "Order made",
         "Order is accepting by restaurant",
         "Food is preparing by the restaurant",
-        "Tapau is waiting to be collected"
+        "Tapau is ready to be collected"
       ]
     };
   }
@@ -44,6 +44,25 @@ class Tapau extends Component {
             .get()
             .then(rest => {
               rest.forEach(eachrest => {
+                var activeStep;
+                if (
+                  order.data().collectTime ||
+                  !order.data().collectTime === ""
+                ) {
+                  activeStep = 4;
+                } else if (
+                  order.data().preparedTime ||
+                  !order.data().preparedTime === ""
+                ) {
+                  activeStep = 3;
+                } else if (
+                  order.data().acceptedTime ||
+                  !order.data().acceptedTime === ""
+                ) {
+                  activeStep = 2;
+                } else {
+                  activeStep = 1;
+                }
                 orderlist.push({
                   orderid: order.id,
                   custid: order.data().custid,
@@ -57,18 +76,20 @@ class Tapau extends Component {
                       ? ""
                       : new Date(order.data().orderTime.seconds * 1000),
                   acceptedTime:
-                    !order.data().orderTime || order.data().acceptedTime === ""
+                    !order.data().acceptedTime ||
+                    order.data().acceptedTime === ""
                       ? ""
                       : new Date(order.data().acceptedTime.seconds * 1000),
                   collectTime:
-                    !order.data().orderTime || order.data().collectTime === ""
+                    !order.data().collectTime || order.data().collectTime === ""
                       ? ""
                       : new Date(order.data().collectTime.seconds * 1000),
                   preparedTime:
-                    !order.data().orderTime || order.data().preparedTime === ""
+                    !order.data().preparedTime ||
+                    order.data().preparedTime === ""
                       ? ""
                       : new Date(order.data().preparedTime.seconds * 1000),
-                  activeStep: 1
+                  activeStep: activeStep
                 });
               });
               orderlist.sort(function(a, b) {
@@ -84,17 +105,26 @@ class Tapau extends Component {
   section = (label, order, index) => {
     switch (index) {
       case 0:
-        return (
-          <Step key={index}>
-            <StepLabel>
-              {label +
-                "\n" +
-                order.orderTime.getHours() +
-                ":" +
-                order.orderTime.getMinutes()}
-            </StepLabel>
-          </Step>
-        );
+        if (order.orderTime) {
+          return (
+            <Step key={index}>
+              <StepLabel>
+                {label +
+                  "\n" +
+                  order.orderTime.getHours() +
+                  ":" +
+                  order.orderTime.getMinutes()}
+              </StepLabel>
+            </Step>
+          );
+        } else {
+          return (
+            <Step key={index}>
+              <StepLabel>{label + "\n"}</StepLabel>
+            </Step>
+          );
+        }
+
       case 1:
         if (order.acceptedTime) {
           return (
@@ -159,6 +189,50 @@ class Tapau extends Component {
         return <div />;
     }
   };
+  ButtonSection = order => {
+    if (order.collectTime) {
+      return null;
+    } else if (order.preparedTime) {
+      return (
+        <ExpansionPanelActions>
+          <Button
+            variant="raised"
+            style={{
+              backgroundColor: "#ef5350",
+              color: "white"
+            }}
+          >
+            Collect Order
+          </Button>
+        </ExpansionPanelActions>
+      );
+    } else if (order.acceptedTime) {
+      return (
+        <ExpansionPanelActions>
+          <Button disabled variant="raised">
+            Collect Order
+          </Button>
+        </ExpansionPanelActions>
+      );
+    } else {
+      return (
+        <ExpansionPanelActions>
+          <Button
+            variant="raised"
+            style={{
+              backgroundColor: "#dc3545",
+              color: "white"
+            }}
+          >
+            Cancel Order
+          </Button>
+          <Button disabled variant="raised">
+            Collect Order
+          </Button>
+        </ExpansionPanelActions>
+      );
+    }
+  };
   render() {
     return (
       <div style={{ paddingTop: "60px" }}>
@@ -173,23 +247,28 @@ class Tapau extends Component {
             >
               <Grid container spacing={24}>
                 <Grid item xs={12} style={{ paddingBottom: "0" }}>
-                  <Typography variant="title">{order.restname + " "}</Typography>
+                  <Typography variant="title">
+                    {order.restname + " "}
+                  </Typography>
                 </Grid>
-                <Grid item xs={12} style={{ paddingTop: "0" }}>
-                <Typography variant="subheading">
-                    {" "}
-                    {order.orderTime.getDate() +
-                      "-" +
-                      (order.orderTime.getMonth() + 1) +
-                      "-" +
-                      order.orderTime.getFullYear()}
-                      </Typography>
-                </Grid>
+                {order.orderTime && (
+                  <Grid item xs={12} style={{ paddingTop: "0" }}>
+                    <Typography variant="subheading">
+                      {" "}
+                      {order.orderTime.getDate() +
+                        "-" +
+                        (order.orderTime.getMonth() + 1) +
+                        "-" +
+                        order.orderTime.getFullYear()}
+                    </Typography>
+                  </Grid>
+                )}
               </Grid>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails
               style={{
-                display: "block"
+                display: "block",
+                paddingBottom: "0px"
               }}
             >
               <Stepper
@@ -239,17 +318,7 @@ class Tapau extends Component {
               </List>
             </ExpansionPanelDetails>
             <Divider />
-            <ExpansionPanelActions>
-              <Button
-                variant="raised"
-                style={{
-                  backgroundColor: "#EF5350",
-                  color: "white"
-                }}
-              >
-                Collect Order
-              </Button>
-            </ExpansionPanelActions>
+            {this.ButtonSection(order)}
           </ExpansionPanel>
         ))}
       </div>

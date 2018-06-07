@@ -7,7 +7,7 @@ import registerServiceWorker from "./registerServiceWorker";
 const theme = createMuiTheme({
   typography: {
     // Use the system font instead of the default Roboto font.
-    fontFamily: ["Circular Std Book","Circular Std Medium"].join(",")
+    fontFamily: ["Circular Std Medium"].join(",")
   }
 });
 function RootApp() {

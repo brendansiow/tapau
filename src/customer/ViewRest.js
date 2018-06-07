@@ -32,8 +32,7 @@ class ViewRest extends Component {
   }
   componentDidMount() {
     //get this restaurant details
-    db
-      .collection("restaurant")
+    db.collection("restaurant")
       .doc(this.props.match.params.restid)
       .get()
       .then(doc => {
@@ -46,8 +45,7 @@ class ViewRest extends Component {
         console.log("Error getting documents: ", error);
       });
     //get menu
-    db
-      .collection("menu")
+    db.collection("menu")
       .where("rid", "==", this.props.match.params.restid)
       .where("visibility", "==", true)
       .onSnapshot(menus => {
@@ -62,8 +60,7 @@ class ViewRest extends Component {
         });
         this.setState({ menu: menu });
       });
-    db
-      .collection("food")
+    db.collection("food")
       .where("rid", "==", this.props.match.params.restid)
       .onSnapshot(foods => {
         var foodlist = [];
@@ -106,52 +103,55 @@ class ViewRest extends Component {
   };
   addOrder = () => {
     db.collection("order")
-    .add({
-      "custid":this.props.loginuser.uid,
-      "restid": this.state.restaurant.uid,
-      "foodlist": this.state.cart,
-      "total": this.state.total,
-      "orderTime": firebase.firestore.FieldValue.serverTimestamp(),
-      "acceptedTime":"",
-      "preparedTime":"",
-      "collectTime":""
-    })
-    var notiToken = [];
-    db
-      .collection("user")
-      .where("uid", "==", this.state.restaurant.uid)
-      .get()
-      .then(users => {
-        users.forEach(user => {
-          notiToken = user.data().notiToken;
-          var config = {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
-            }
-          }
-          notiToken.forEach(eachToken=>{
-          axios.post(
-              "https://fcm.googleapis.com/fcm/send",
-              {
-                notification: {
-                  title: "You have a new order!",
-                  body: "From " + this.props.loginuser.name,
-                  icon: "img/logo/logo72.png",
-                  click_action: "https://tapau.tk"
-                },
-                to: eachToken
-              },
-              config
-            )
-            .then(function(response) {
-              console.log(response);
-            })
-            .catch(function(error) {
-              console.log(error);
-            })
-          })
-        });
+      .add({
+        custid: this.props.loginuser.uid,
+        restid: this.state.restaurant.uid,
+        foodlist: this.state.cart,
+        total: this.state.total,
+        orderTime: firebase.firestore.FieldValue.serverTimestamp(),
+        acceptedTime: "",
+        preparedTime: "",
+        collectTime: ""
+      })
+      .then(result => {
+        var notiToken = [];
+        db.collection("user")
+          .where("uid", "==", this.state.restaurant.uid)
+          .get()
+          .then(users => {
+            users.forEach(user => {
+              notiToken = user.data().notiToken;
+              var config = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
+                }
+              };
+              notiToken.forEach(eachToken => {
+                axios
+                  .post(
+                    "https://fcm.googleapis.com/fcm/send",
+                    {
+                      notification: {
+                        title: "You have a new order!",
+                        body: "From " + this.props.loginuser.name,
+                        icon: "img/logo/logo72.png",
+                        click_action: "https://tapau.tk"
+                      },
+                      to: eachToken
+                    },
+                    config
+                  )
+                  .then(function(response) {
+                    console.log(response);
+                  })
+                  .catch(function(error) {
+                    console.log(error);
+                  });
+              });
+            });
+          });
+        this.props.history.push("/cust/mytapau");
       });
   };
   render() {
