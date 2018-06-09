@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   CardActions,
+  Typography,
   Snackbar,
   ExpansionPanel,
   ExpansionPanelDetails,
@@ -93,63 +94,82 @@ class Login extends Component {
               restaurants and customers to handle their takeaway order.
             </ExpansionPanelDetails>
           </ExpansionPanel>
-        </div>
-          <form onSubmit={this.handleLogin}>
-            <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
-              <CardContent>
-                <h2 style={{ margin: "0px", textAlign: "center" }}>
-                  Login Form
-                </h2>
-                <TextField
-                  id="email"
-                  label="Email"
-                  margin="normal"
-                  required
-                  onChange={this.handleChange}
-                  value={this.state.email}
-                  fullWidth
-                />
-                <TextField
-                  id="password"
-                  label="Password"
-                  type="password"
-                  margin="normal"
-                  fullWidth
-                  required
-                  onChange={this.handleChange}
-                  helperText="Password should contain 6 or more characters!"
-                  value={this.state.password}
-                />
-              </CardContent>
-              <CardActions
-                style={{ display: "flex", justifyContent: "center" }}
-              >
-                <Button
-                  type="submit"
-                  variant="raised"
+          <Card>
+            <CardContent>
+              <Typography style={{ fontSize: "18px" }} color="textSecondary">
+                Word of the Day
+              </Typography>
+              <Typography variant="headline" component="h2">
+                Ta<span
                   style={{
-                    backgroundColor: "#EF5350",
-                    color: "white",
-                    margin: "10px 10px 0px 0px"
+                    display: "inline-block",
+                    transform: "scale(0.6)"
                   }}
                 >
-                  Login
+                  •
+                </span>pau
+              </Typography>
+              <Typography color="textSecondary">verb, noun</Typography>
+              <Typography component="p">
+                In Hokkien (one of the chinese dialects), Tapau means to take
+                away. <br />
+                {'"I tapau (actual term) lunch for you."'}
+              </Typography>
+            </CardContent>
+          </Card>
+        </div>
+        <form onSubmit={this.handleLogin}>
+          <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
+            <CardContent>
+              <h2 style={{ margin: "0px", textAlign: "center" }}>Login Form</h2>
+              <TextField
+                id="email"
+                label="Email"
+                margin="normal"
+                required
+                onChange={this.handleChange}
+                value={this.state.email}
+                fullWidth
+              />
+              <TextField
+                id="password"
+                label="Password"
+                type="password"
+                margin="normal"
+                fullWidth
+                required
+                onChange={this.handleChange}
+                helperText="Password should contain 6 or more characters!"
+                value={this.state.password}
+              />
+            </CardContent>
+            <CardActions style={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                type="submit"
+                variant="raised"
+                style={{
+                  backgroundColor: "#EF5350",
+                  color: "white",
+                  margin: "10px 10px 0px 0px"
+                }}
+              >
+                Login
+              </Button>
+              <Link to="/register" style={{ textDecoration: "none" }}>
+                <Button
+                  variant="raised"
+                  style={{
+                    color: "#EF5350",
+                    backgroundColor: "#ffffff",
+                    margin: "10px 0px 0px 20px"
+                  }}
+                >
+                  Sign Up
                 </Button>
-                <Link to="/register" style={{ textDecoration: "none" }}>
-                  <Button
-                    variant="raised"
-                    style={{
-                      color: "#EF5350",
-                      backgroundColor: "#ffffff",
-                      margin: "10px 0px 0px 20px"
-                    }}
-                  >
-                    Sign Up
-                  </Button>
-                </Link>
-              </CardActions>
-            </Card>
-          </form>
+              </Link>
+            </CardActions>
+          </Card>
+        </form>
         <Snackbar
           anchorOrigin={{
             vertical: "bottom",

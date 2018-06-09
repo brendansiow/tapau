@@ -12,15 +12,25 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Divider,
-  Button
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from "@material-ui/core";
+import QrReader from "react-qr-reader";
 import firebase from "../firebase";
 const db = firebase.firestore();
 class Order extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      orderlist: []
+      orderlist: [],
+      openQR: false,
+      QRCodeOrder: "",
+      openCollectDialog: false,
+      openErrorDialog: false
     };
   }
   componentDidMount() {
@@ -35,7 +45,7 @@ class Order extends Component {
             .get()
             .then(cust => {
               cust.forEach(eachcust => {
-                console.log(order.data())
+                console.log(order.data());
                 orderlist.push({
                   orderid: order.id,
                   custid: order.data().custid,
@@ -49,7 +59,8 @@ class Order extends Component {
                       ? ""
                       : new Date(order.data().orderTime.seconds * 1000),
                   acceptedTime:
-                    !order.data().acceptedTime || order.data().acceptedTime === ""
+                    !order.data().acceptedTime ||
+                    order.data().acceptedTime === ""
                       ? ""
                       : new Date(order.data().acceptedTime.seconds * 1000),
                   collectTime:
@@ -57,7 +68,8 @@ class Order extends Component {
                       ? ""
                       : new Date(order.data().collectTime.seconds * 1000),
                   preparedTime:
-                    !order.data().preparedTime || order.data().preparedTime === ""
+                    !order.data().preparedTime ||
+                    order.data().preparedTime === ""
                       ? ""
                       : new Date(order.data().preparedTime.seconds * 1000),
                   activeStep: 1
@@ -77,15 +89,13 @@ class Order extends Component {
     if (order.collectTime) {
       return (
         <span style={{ color: "#28a745" }}>
-          Order is collected by customer.
+          Order is collected.
         </span>
       );
     } else if (order.preparedTime) {
       return <span style={{ color: "#28a745" }}>Order is ready.</span>;
     } else if (order.acceptedTime) {
-      return (
-        <span style={{ color: "#17a2b8" }}>Preparing order...</span>
-      );
+      return <span style={{ color: "#17a2b8" }}>Preparing order...</span>;
     } else {
       return <span style={{ color: "dimgrey" }}>Waiting to be accept...</span>;
     }
@@ -102,6 +112,7 @@ class Order extends Component {
               backgroundColor: "#EF5350",
               color: "white"
             }}
+            onClick={this.openDialog(order)}
           >
             Scan QR
           </Button>
@@ -148,6 +159,46 @@ class Order extends Component {
       );
     }
   };
+  handleScan = data => {
+    if (data) {
+      if (data === this.state.validateOrder) {
+        this.setState({
+          QRCodeOrder: data,
+          openQR: false,
+          openCollectDialog: true
+        });
+      } else {
+        this.setState({
+          openQR: false,
+          openErrorDialog: true
+        });
+      }
+    }
+  };
+  handleError(err) {
+    console.error(err);
+  }
+  handleClose = () => {
+    this.setState({
+      openQR: false
+    });
+  };
+  handleCloseCollectDialog = () => {
+    this.setState({
+      openCollectDialog: false
+    });
+  };
+  handleCloseErrorDialog = () => {
+    this.setState({
+      openErrorDialog: false
+    });
+  };
+  openDialog = data => event => {
+    this.setState({
+      openQR: true,
+      validateOrder: data.orderid
+    });
+  };
   updateAccept = order => event => {
     db.collection("order")
       .doc(order.orderid)
@@ -158,16 +209,27 @@ class Order extends Component {
         console.log(result);
       });
   };
-  updateReady= order => event => {
+  updateReady = order => event => {
     db.collection("order")
-    .doc(order.orderid)
+      .doc(order.orderid)
+      .update({
+        preparedTime: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(result => {
+        console.log(result);
+      });
+  };
+  updateCollect = () => {
+    this.handleCloseCollectDialog()
+    db.collection("order")
+    .doc(this.state.QRCodeOrder)
     .update({
-      preparedTime: firebase.firestore.FieldValue.serverTimestamp()
+      collectTime: firebase.firestore.FieldValue.serverTimestamp()
     })
     .then(result => {
       console.log(result);
     });
-  }
+  };
   render() {
     return (
       <div style={{ paddingTop: "60px" }}>
@@ -251,6 +313,66 @@ class Order extends Component {
             {this.ButtonSection(order)}
           </ExpansionPanel>
         ))}
+        <Dialog
+          open={this.state.openQR}
+          onClose={this.handleClose}
+          fullWidth
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>Scan QR code below</DialogTitle>
+          <DialogContent>
+            <QrReader
+              onError={this.handleError}
+              onScan={this.handleScan}
+              style={{ width: "100%" }}
+              showViewFinder={false}
+            />
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={this.state.openErrorDialog}
+          onClose={this.handleCloseErrorDialog}
+          fullWidth
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle style={{ color: "red" }}>
+            The QRCode is wrong!
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Your customer showed a wrong QRCode for this order!
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloseErrorDialog} color="primary">
+              Okay
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.openCollectDialog}
+          onClose={this.handleCloseCollectDialog}
+          fullWidth
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>The QRCode matches!</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure your customer wish to collect the order?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloseCollectDialog} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={this.updateCollect} color="primary">
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }

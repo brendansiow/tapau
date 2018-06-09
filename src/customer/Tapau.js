@@ -15,8 +15,12 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Typography,
-  Grid
+  Grid,
+  Dialog,
+  DialogContent,
+  DialogTitle
 } from "@material-ui/core";
+import QRCode from "qrcode.react";
 import firebase from "../firebase";
 const db = firebase.firestore();
 class Tapau extends Component {
@@ -26,10 +30,12 @@ class Tapau extends Component {
       orderlist: [],
       steps: [
         "Order made",
-        "Order is accepting by restaurant",
+        "Order is waiting to be accepted",
         "Food is preparing by the restaurant",
         "Tapau is ready to be collected"
-      ]
+      ],
+      open: false,
+      collectOrder: ""
     };
   }
   componentDidMount() {
@@ -120,7 +126,7 @@ class Tapau extends Component {
         } else {
           return (
             <Step key={index}>
-              <StepLabel>{label + "\n"}</StepLabel>
+              <StepLabel>{label}</StepLabel>
             </Step>
           );
         }
@@ -130,7 +136,7 @@ class Tapau extends Component {
           return (
             <Step key={index}>
               <StepLabel>
-                {label +
+                {"Order is accepted" +
                   "\n" +
                   order.acceptedTime.getHours() +
                   ":" +
@@ -141,7 +147,7 @@ class Tapau extends Component {
         } else {
           return (
             <Step key={index}>
-              <StepLabel>{label + "\n"}</StepLabel>
+              <StepLabel>{label}</StepLabel>
             </Step>
           );
         }
@@ -150,7 +156,7 @@ class Tapau extends Component {
           return (
             <Step key={index}>
               <StepLabel>
-                {label +
+                {"Food is prepared" +
                   "\n" +
                   order.preparedTime.getHours() +
                   ":" +
@@ -161,16 +167,16 @@ class Tapau extends Component {
         } else {
           return (
             <Step key={index}>
-              <StepLabel>{label + "\n"}</StepLabel>
+              <StepLabel>{label}</StepLabel>
             </Step>
           );
         }
       case 3:
-        if (order.collecTime) {
+        if (order.collectTime) {
           return (
             <Step key={index}>
               <StepLabel>
-                {label +
+                {"Tapau is collected" +
                   "\n" +
                   order.collectTime.getHours() +
                   ":" +
@@ -181,7 +187,7 @@ class Tapau extends Component {
         } else {
           return (
             <Step key={index}>
-              <StepLabel>{label + "\n"}</StepLabel>
+              <StepLabel>{label}</StepLabel>
             </Step>
           );
         }
@@ -201,6 +207,7 @@ class Tapau extends Component {
               backgroundColor: "#ef5350",
               color: "white"
             }}
+            onClick={this.openDialog(order)}
           >
             Collect Order
           </Button>
@@ -232,6 +239,17 @@ class Tapau extends Component {
         </ExpansionPanelActions>
       );
     }
+  };
+  handleClose = () => {
+    this.setState({
+      open: false
+    });
+  };
+  openDialog = order => event => {
+    this.setState({
+      collectOrder: order,
+      open: true
+    });
   };
   render() {
     return (
@@ -321,6 +339,25 @@ class Tapau extends Component {
             {this.ButtonSection(order)}
           </ExpansionPanel>
         ))}
+        <Dialog
+          open={this.state.open}
+          onClose={this.handleClose}
+          fullWidth
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>Your QRCode to collect Tapau</DialogTitle>
+          <DialogContent>
+            <QRCode
+              value={this.state.collectOrder.orderid}
+              size={1000}
+              bgColor={"#ffffff"}
+              fgColor={"#000000"}
+              level={"H"}
+              style={{width:"100%",height:"100%"}}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
