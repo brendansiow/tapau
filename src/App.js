@@ -12,7 +12,7 @@ import CustProfile from './customer/CustProfile'
 import ViewRest from './customer/ViewRest'
 import {
   IconButton, AppBar, Typography, Toolbar, List, Drawer, Divider, ListItem, ListItemText, Icon,
-  CircularProgress, Snackbar,Button
+  CircularProgress, Snackbar,Button, SwipeableDrawer
 } from '@material-ui/core';
 import { Route, Link, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import firebase from './firebase';
@@ -97,6 +97,7 @@ class App extends Component {
                 .then((querySnapshot) => {
                   querySnapshot.forEach(function (doc) {
                     user["restaurant"] = doc.id
+                    user["restname"] = doc.data().name
                   });
                   this.setState({
                     loginuser: user,
@@ -174,6 +175,7 @@ class App extends Component {
     });
   }
   render() {
+    const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
     if (this.state.isAuthenticating) {
       return (
         <div style={{ marginTop: '50%', textAlign: 'center' }}>
@@ -228,7 +230,12 @@ class App extends Component {
             </Button>
           }
         />
-          <Drawer open={this.state.open} onClose={() => this.setState({ open: false })}>
+        <SwipeableDrawer open={this.state.open}  
+        onOpen={() => this.setState({ open: true })} 
+        onClose={() => this.setState({ open: false })}
+        disableBackdropTransition={!iOS}
+        disableDiscovery={iOS}
+        >
             <div tabIndex={0} role="button" style={{ width: "250px" }}>
               <List style={{ backgroundColor: "#ef5350" }}>
                 <ListItem>
@@ -299,7 +306,7 @@ class App extends Component {
                 }
               </List>
             </div>
-          </Drawer>
+          </SwipeableDrawer>
           <HomeRoute exact path="/" setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <GuestRoute path="/login" component={Login} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />
           <GuestRoute path="/register" component={Register} setTitle={this.setTitle.bind(this)} loginuser={this.state.loginuser} />

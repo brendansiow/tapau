@@ -136,7 +136,7 @@ class ViewRest extends Component {
                         title: "You have a new order!",
                         body: "From " + this.props.loginuser.name,
                         icon: "img/logo/logo72.png",
-                        click_action: "https://tapau.tk"
+                        click_action: "https://tapau.tk/rest/myorder"
                       },
                       to: eachToken
                     },

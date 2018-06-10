@@ -20,6 +20,7 @@ import {
   DialogActions
 } from "@material-ui/core";
 import QrReader from "react-qr-reader";
+import axios from 'axios';
 import firebase from "../firebase";
 const db = firebase.firestore();
 class Order extends Component {
@@ -87,11 +88,7 @@ class Order extends Component {
   }
   StatusSection = order => {
     if (order.collectTime) {
-      return (
-        <span style={{ color: "#28a745" }}>
-          Order is collected.
-        </span>
-      );
+      return <span style={{ color: "#28a745" }}>Order is collected.</span>;
     } else if (order.preparedTime) {
       return <span style={{ color: "#28a745" }}>Order is ready.</span>;
     } else if (order.acceptedTime) {
@@ -161,7 +158,7 @@ class Order extends Component {
   };
   handleScan = data => {
     if (data) {
-      if (data === this.state.validateOrder) {
+      if (data === this.state.validateOrder.orderid) {
         this.setState({
           QRCodeOrder: data,
           openQR: false,
@@ -196,7 +193,7 @@ class Order extends Component {
   openDialog = data => event => {
     this.setState({
       openQR: true,
-      validateOrder: data.orderid
+      validateOrder: data
     });
   };
   updateAccept = order => event => {
@@ -206,7 +203,43 @@ class Order extends Component {
         acceptedTime: firebase.firestore.FieldValue.serverTimestamp()
       })
       .then(result => {
-        console.log(result);
+        var notiToken = [];
+        db.collection("user")
+          .where("uid", "==", order.custid)
+          .get()
+          .then(users => {
+            users.forEach(user => {
+              notiToken = user.data().notiToken;
+              var config = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
+                }
+              };
+              notiToken.forEach(eachToken => {
+                axios
+                  .post(
+                    "https://fcm.googleapis.com/fcm/send",
+                    {
+                      notification: {
+                        title: "You order has been accepted!",
+                        body: "From " + this.props.loginuser.restname,
+                        icon: "img/logo/logo72.png",
+                        click_action: "https://tapau.tk/cust/mytapau"
+                      },
+                      to: eachToken
+                    },
+                    config
+                  )
+                  .then(function(response) {
+                    console.log(response);
+                  })
+                  .catch(function(error) {
+                    console.log(error);
+                  });
+              });
+            });
+          });
       });
   };
   updateReady = order => event => {
@@ -216,19 +249,91 @@ class Order extends Component {
         preparedTime: firebase.firestore.FieldValue.serverTimestamp()
       })
       .then(result => {
-        console.log(result);
+        var notiToken = [];
+        db.collection("user")
+        .where("uid", "==", order.custid)
+        .get()
+        .then(users => {
+          users.forEach(user => {
+            notiToken = user.data().notiToken;
+            var config = {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
+              }
+            };
+            notiToken.forEach(eachToken => {
+              axios
+                .post(
+                  "https://fcm.googleapis.com/fcm/send",
+                  {
+                    notification: {
+                      title: "You order is ready to collect!",
+                      body: "Please show your QRCode upon collection.From " + this.props.loginuser.restname,
+                      icon: "img/logo/logo72.png",
+                      click_action: "https://tapau.tk/cust/mytapau"
+                    },
+                    to: eachToken
+                  },
+                  config
+                )
+                .then(function(response) {
+                  console.log(response);
+                })
+                .catch(function(error) {
+                  console.log(error);
+                });
+            });
+          });
+        });
       });
   };
   updateCollect = () => {
-    this.handleCloseCollectDialog()
+    this.handleCloseCollectDialog();
     db.collection("order")
-    .doc(this.state.QRCodeOrder)
-    .update({
-      collectTime: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(result => {
-      console.log(result);
-    });
+      .doc(this.state.QRCodeOrder)
+      .update({
+        collectTime: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(result => {
+        var notiToken = [];
+        db.collection("user")
+        .where("uid", "==", this.state.validateOrder.custid)
+        .get()
+        .then(users => {
+          users.forEach(user => {
+            notiToken = user.data().notiToken;
+            var config = {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
+              }
+            };
+            notiToken.forEach(eachToken => {
+              axios
+                .post(
+                  "https://fcm.googleapis.com/fcm/send",
+                  {
+                    notification: {
+                      title: "You have collected your order!",
+                      body: "Thanks for choosing us! See You.From " + this.props.loginuser.restname,
+                      icon: "img/logo/logo72.png",
+                      click_action: "https://tapau.tk/cust/mytapau"
+                    },
+                    to: eachToken
+                  },
+                  config
+                )
+                .then(function(response) {
+                  console.log(response);
+                })
+                .catch(function(error) {
+                  console.log(error);
+                });
+            });
+          });
+        });
+      });
   };
   render() {
     return (
