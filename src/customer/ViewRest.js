@@ -111,7 +111,9 @@ class ViewRest extends Component {
         orderTime: firebase.firestore.FieldValue.serverTimestamp(),
         acceptedTime: "",
         preparedTime: "",
-        collectTime: ""
+        collectTime: "",
+        cancelledTime: "",
+        cancelSide:""
       })
       .then(result => {
         var notiToken = [];

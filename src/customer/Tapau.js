@@ -18,9 +18,12 @@ import {
   Grid,
   Dialog,
   DialogContent,
-  DialogTitle
+  DialogTitle,
+  DialogContentText,
+  DialogActions
 } from "@material-ui/core";
 import QRCode from "qrcode.react";
+import axios from "axios";
 import firebase from "../firebase";
 const db = firebase.firestore();
 class Tapau extends Component {
@@ -35,7 +38,8 @@ class Tapau extends Component {
         "Tapau is ready to be collected"
       ],
       open: false,
-      collectOrder: ""
+      tempOrder: "",
+      openCancelDialog: false
     };
   }
   componentDidMount() {
@@ -95,6 +99,12 @@ class Tapau extends Component {
                     order.data().preparedTime === ""
                       ? ""
                       : new Date(order.data().preparedTime.seconds * 1000),
+                  cancelledTime:
+                    !order.data().cancelledTime ||
+                    order.data().cancelledTime === ""
+                      ? ""
+                      : new Date(order.data().cancelledTime.seconds * 1000),
+                  cancelSide: order.data().cancelSide,
                   activeStep: activeStep
                 });
               });
@@ -132,7 +142,19 @@ class Tapau extends Component {
         }
 
       case 1:
-        if (order.acceptedTime) {
+        if (order.cancelledTime) {
+          return(
+          <Step key={index}>
+              <StepLabel error>
+                {"Order is cancel!" +
+                  "\n" +
+                  order.cancelledTime.getHours() +
+                  ":" +
+                  order.cancelledTime.getMinutes()}
+              </StepLabel>
+            </Step>
+          )
+        } else if (order.acceptedTime) {
           return (
             <Step key={index}>
               <StepLabel>
@@ -196,7 +218,17 @@ class Tapau extends Component {
     }
   };
   ButtonSection = order => {
-    if (order.collectTime) {
+    if(order.cancelledTime){
+      return (
+        <ExpansionPanelActions style={{justifyContent:"center"}}>
+         {order.cancelSide === "cust" ? (
+         <Typography variant="subheading">You cancelled this order</Typography>
+         ):(
+           <Typography variant="subheading">The restaurant cancelled this order</Typography>
+          )}
+        </ExpansionPanelActions>
+      );
+    }else if (order.collectTime) {
       return null;
     } else if (order.preparedTime) {
       return (
@@ -230,6 +262,7 @@ class Tapau extends Component {
               backgroundColor: "#dc3545",
               color: "white"
             }}
+            onClick={this.CancelDialog(order)}
           >
             Cancel Order
           </Button>
@@ -247,9 +280,70 @@ class Tapau extends Component {
   };
   openDialog = order => event => {
     this.setState({
-      collectOrder: order,
+      tempOrder: order,
       open: true
     });
+  };
+  CancelDialog = order => event => {
+    this.setState({
+      openCancelDialog: true,
+      tempOrder: order
+    });
+  };
+  handleCloseCancelDialog = () => {
+    this.setState({
+      tempOrder: "",
+      openCancelDialog: false
+    });
+  };
+  updateCancel = () => {
+    db.collection("order")
+      .doc(this.state.tempOrder.orderid)
+      .update({
+        cancelledTime: firebase.firestore.FieldValue.serverTimestamp(),
+        cancelSide: "cust"
+      })
+      .then(result => {
+        var notiToken = [];
+        db.collection("user")
+          .where("uid", "==", this.state.tempOrder.restid)
+          .get()
+          .then(users => {
+            users.forEach(user => {
+              notiToken = user.data().notiToken;
+              var config = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
+                }
+              };
+              notiToken.forEach(eachToken => {
+                axios
+                  .post(
+                    "https://fcm.googleapis.com/fcm/send",
+                    {
+                      notification: {
+                        title: "Order is cancelled",
+                        body:
+                          this.props.loginuser.name +
+                          " cancelled the order placed !",
+                        icon: "img/logo/logo72.png",
+                        click_action: "https://tapau.tk/cust/mytapau"
+                      },
+                      to: eachToken
+                    },
+                    config
+                  )
+                  .then(function(response) {
+                    console.log(response);
+                  })
+                  .catch(function(error) {
+                    console.log(error);
+                  });
+              });
+            });
+          });
+      });
   };
   render() {
     return (
@@ -349,14 +443,36 @@ class Tapau extends Component {
           <DialogTitle>Your QRCode to collect Tapau</DialogTitle>
           <DialogContent>
             <QRCode
-              value={this.state.collectOrder.orderid}
+              value={this.state.tempOrder.orderid}
               size={1000}
               bgColor={"#ffffff"}
               fgColor={"#000000"}
               level={"H"}
-              style={{width:"100%",height:"100%"}}
+              style={{ width: "100%", height: "100%" }}
             />
           </DialogContent>
+        </Dialog>
+        <Dialog
+          open={this.state.openCancelDialog}
+          onClose={this.handleCloseCancelDialog}
+          fullWidth
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>Cancel Tapau</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to cancel your food order?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloseCancelDialog} color="primary">
+              No
+            </Button>
+            <Button onClick={this.updateCancel} color="primary">
+              Yes
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );

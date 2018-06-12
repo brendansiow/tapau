@@ -20,7 +20,7 @@ import {
   DialogActions
 } from "@material-ui/core";
 import QrReader from "react-qr-reader";
-import axios from 'axios';
+import axios from "axios";
 import firebase from "../firebase";
 const db = firebase.firestore();
 class Order extends Component {
@@ -46,7 +46,6 @@ class Order extends Component {
             .get()
             .then(cust => {
               cust.forEach(eachcust => {
-                console.log(order.data());
                 orderlist.push({
                   orderid: order.id,
                   custid: order.data().custid,
@@ -73,6 +72,12 @@ class Order extends Component {
                     order.data().preparedTime === ""
                       ? ""
                       : new Date(order.data().preparedTime.seconds * 1000),
+                  cancelledTime:
+                    !order.data().cancelledTime ||
+                    order.data().cancelledTime === ""
+                      ? ""
+                      : new Date(order.data().cancelledTime.seconds * 1000),
+                  cancelSide: order.data().cancelSide,
                   activeStep: 1
                 });
               });
@@ -87,7 +92,9 @@ class Order extends Component {
       });
   }
   StatusSection = order => {
-    if (order.collectTime) {
+    if (order.cancelledTime) {
+      return <span style={{ color: "#dc3545" }}>Order is cancelled.</span>;
+    } else if (order.collectTime) {
       return <span style={{ color: "#28a745" }}>Order is collected.</span>;
     } else if (order.preparedTime) {
       return <span style={{ color: "#28a745" }}>Order is ready.</span>;
@@ -98,7 +105,21 @@ class Order extends Component {
     }
   };
   ButtonSection = order => {
-    if (order.collectTime) {
+    if (order.cancelledTime) {
+      return (
+        <ExpansionPanelActions style={{ justifyContent: "center" }}>
+          {order.cancelSide === "rest" ? (
+            <Typography variant="subheading">
+              You cancelled this order
+            </Typography>
+          ) : (
+            <Typography variant="subheading">
+              The customer cancelled this order
+            </Typography>
+          )}
+        </ExpansionPanelActions>
+      );
+    } else if (order.collectTime) {
       return null;
     } else if (order.preparedTime) {
       return (
@@ -139,6 +160,7 @@ class Order extends Component {
               backgroundColor: "grey",
               color: "white"
             }}
+            onClick={this.updateCancel(order)}
           >
             Cancel Order
           </Button>
@@ -251,6 +273,104 @@ class Order extends Component {
       .then(result => {
         var notiToken = [];
         db.collection("user")
+          .where("uid", "==", order.custid)
+          .get()
+          .then(users => {
+            users.forEach(user => {
+              notiToken = user.data().notiToken;
+              var config = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
+                }
+              };
+              notiToken.forEach(eachToken => {
+                axios
+                  .post(
+                    "https://fcm.googleapis.com/fcm/send",
+                    {
+                      notification: {
+                        title: "You order is ready to collect!",
+                        body:
+                          "Please show your QRCode upon collection.From " +
+                          this.props.loginuser.restname,
+                        icon: "img/logo/logo72.png",
+                        click_action: "https://tapau.tk/cust/mytapau"
+                      },
+                      to: eachToken
+                    },
+                    config
+                  )
+                  .then(function(response) {
+                    console.log(response);
+                  })
+                  .catch(function(error) {
+                    console.log(error);
+                  });
+              });
+            });
+          });
+      });
+  };
+  updateCollect = () => {
+    this.handleCloseCollectDialog();
+    db.collection("order")
+      .doc(this.state.QRCodeOrder)
+      .update({
+        collectTime: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(result => {
+        var notiToken = [];
+        db.collection("user")
+          .where("uid", "==", this.state.validateOrder.custid)
+          .get()
+          .then(users => {
+            users.forEach(user => {
+              notiToken = user.data().notiToken;
+              var config = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
+                }
+              };
+              notiToken.forEach(eachToken => {
+                axios
+                  .post(
+                    "https://fcm.googleapis.com/fcm/send",
+                    {
+                      notification: {
+                        title: "You have collected your order!",
+                        body:
+                          "Thanks for choosing us! See You.From " +
+                          this.props.loginuser.restname,
+                        icon: "img/logo/logo72.png",
+                        click_action: "https://tapau.tk/cust/mytapau"
+                      },
+                      to: eachToken
+                    },
+                    config
+                  )
+                  .then(function(response) {
+                    console.log(response);
+                  })
+                  .catch(function(error) {
+                    console.log(error);
+                  });
+              });
+            });
+          });
+      });
+  };
+  updateCancel= order => event =>{
+    db.collection("order")
+    .doc(order.orderid)
+    .update({
+      cancelledTime: firebase.firestore.FieldValue.serverTimestamp(),
+      cancelSide: "rest"
+    })
+    .then(result => {
+      var notiToken = [];
+      db.collection("user")
         .where("uid", "==", order.custid)
         .get()
         .then(users => {
@@ -268,8 +388,9 @@ class Order extends Component {
                   "https://fcm.googleapis.com/fcm/send",
                   {
                     notification: {
-                      title: "You order is ready to collect!",
-                      body: "Please show your QRCode upon collection.From " + this.props.loginuser.restname,
+                      title: "Order is cancelled",
+                      body:
+                        "Sorry, we cant prepared your order right now! From: "+this.props.loginuser.restname ,
                       icon: "img/logo/logo72.png",
                       click_action: "https://tapau.tk/cust/mytapau"
                     },
@@ -286,55 +407,8 @@ class Order extends Component {
             });
           });
         });
-      });
-  };
-  updateCollect = () => {
-    this.handleCloseCollectDialog();
-    db.collection("order")
-      .doc(this.state.QRCodeOrder)
-      .update({
-        collectTime: firebase.firestore.FieldValue.serverTimestamp()
-      })
-      .then(result => {
-        var notiToken = [];
-        db.collection("user")
-        .where("uid", "==", this.state.validateOrder.custid)
-        .get()
-        .then(users => {
-          users.forEach(user => {
-            notiToken = user.data().notiToken;
-            var config = {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
-              }
-            };
-            notiToken.forEach(eachToken => {
-              axios
-                .post(
-                  "https://fcm.googleapis.com/fcm/send",
-                  {
-                    notification: {
-                      title: "You have collected your order!",
-                      body: "Thanks for choosing us! See You.From " + this.props.loginuser.restname,
-                      icon: "img/logo/logo72.png",
-                      click_action: "https://tapau.tk/cust/mytapau"
-                    },
-                    to: eachToken
-                  },
-                  config
-                )
-                .then(function(response) {
-                  console.log(response);
-                })
-                .catch(function(error) {
-                  console.log(error);
-                });
-            });
-          });
-        });
-      });
-  };
+    });
+  }
   render() {
     return (
       <div style={{ paddingTop: "60px" }}>

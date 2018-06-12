@@ -16,7 +16,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
+  Typography
 } from "@material-ui/core";
 import firebase from "./firebase";
 const db = firebase.firestore();
@@ -57,8 +58,7 @@ class About extends Component {
   };
   handleSubmit = e => {
     e.preventDefault();
-    db
-      .collection("feedback")
+    db.collection("feedback")
       .add({
         name: this.state.name,
         feedback: this.state.feedback
@@ -88,8 +88,7 @@ class About extends Component {
   handleDelete = e => {
     e.preventDefault();
     this.setState({ deleteDialog: false });
-    db
-      .collection("feedback")
+    db.collection("feedback")
       .doc(this.state.deleteItemid)
       .delete()
       .then(() => {
@@ -111,27 +110,14 @@ class About extends Component {
   render() {
     return (
       <div style={{ paddingTop: "60px" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            paddingTop: "10px"
-          }}
-        >
-          <Button
-            variant="raised"
-            onClick={evt =>
-              this.setState({
-                snackBarMsg: "Tapau is Coming !!",
-                snackBarBtn: "Looking Forward !!",
-                snackbarIsOpen: !this.state.snackbarIsOpen
-              })
-            }
-            style={{ backgroundColor: "#EF5350", color: "white" }}
-          >
-            What now?!?!
-          </Button>
-        </div>
+        <h2 style={{ textAlign: "center" }}>
+          <Icon style={{ fontSize: "30px", lineHeight: "1.3", color: "grey" }}>
+            code
+          </Icon>{" "}
+          with <Icon style={{ lineHeight: "1.3", color: "red" }}>favorite</Icon>{" "}
+          by Tapau
+        </h2>
+        <Typography variant="caption" style={{textAlign:"center"}}>Tapau v0.3 Beta</Typography>
         <Card style={{ marginTop: "20px", padding: "15px 20px 15px 20px" }}>
           <form onSubmit={this.handleSubmit}>
             <CardContent>
@@ -239,12 +225,6 @@ class About extends Component {
             </Button>
           }
         />
-        <h2 style={{ textAlign: "center" }}>
-          <Icon style={{ fontSize: "30px", lineHeight: "1.3", color: "grey" }}>
-            code
-          </Icon>{" "}
-          with <Icon style={{lineHeight:"1.3",color:"red"}}>favorite</Icon> by Tapau
-        </h2>
       </div>
     );
   }

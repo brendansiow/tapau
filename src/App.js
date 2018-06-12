@@ -11,7 +11,7 @@ import Tapau from './customer/Tapau'
 import CustProfile from './customer/CustProfile'
 import ViewRest from './customer/ViewRest'
 import {
-  IconButton, AppBar, Typography, Toolbar, List, Drawer, Divider, ListItem, ListItemText, Icon,
+  IconButton, AppBar, Typography, Toolbar, List, Divider, ListItem, ListItemText, Icon,
   CircularProgress, Snackbar,Button, SwipeableDrawer
 } from '@material-ui/core';
 import { Route, Link, BrowserRouter as Router, Redirect } from 'react-router-dom';
