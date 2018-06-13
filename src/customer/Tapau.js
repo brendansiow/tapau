@@ -292,11 +292,11 @@ class Tapau extends Component {
   };
   handleCloseCancelDialog = () => {
     this.setState({
-      tempOrder: "",
       openCancelDialog: false
     });
   };
   updateCancel = () => {
+    this.handleCloseCancelDialog();
     db.collection("order")
       .doc(this.state.tempOrder.orderid)
       .update({
