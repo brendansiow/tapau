@@ -10,7 +10,11 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
-  Icon
+  Icon,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  CircularProgress
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import firebase from "./firebase";
@@ -20,11 +24,9 @@ class Login extends Component {
     super(props);
     this.state = {
       email: "",
-      password: ""
+      password: "",
+      LoggingIn: false
     };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleLogin = this.handleLogin.bind(this);
-    this.handleRequestClose = this.handleRequestClose.bind(this);
   }
   componentDidMount() {
     this.props.setTitle("Login");
@@ -36,6 +38,9 @@ class Login extends Component {
   };
   handleLogin = e => {
     e.preventDefault();
+    this.setState({
+      LoggingIn:true
+    })
     firebase
       .auth()
       .signInWithEmailAndPassword(this.state.email, this.state.password)
@@ -43,10 +48,7 @@ class Login extends Component {
         this.setState({
           snackBarMsg: "Login Successfully !!",
           snackBarBtn: "Okay !!",
-          email: "",
-          password: "",
           snackbarIsOpen: !this.state.snackbarIsOpen,
-          loginsuccess: true
         });
       })
       .catch(error => {
@@ -193,6 +195,17 @@ class Login extends Component {
             </Button>
           }
         />
+        <Dialog
+        open={this.state.LoggingIn}
+        fullWidth
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle style={{ textAlign: 'center' }}>Logging in...</DialogTitle>
+        <DialogContent style={{ textAlign: 'center' }}>
+          <CircularProgress style={{ color: '#ef5350' }} size={50} thickness={5} />
+        </DialogContent>
+      </Dialog>
       </div>
     );
   }
