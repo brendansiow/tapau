@@ -39,8 +39,8 @@ class Login extends Component {
   handleLogin = e => {
     e.preventDefault();
     this.setState({
-      LoggingIn:true
-    })
+      LoggingIn: true
+    });
     firebase
       .auth()
       .signInWithEmailAndPassword(this.state.email, this.state.password)
@@ -48,25 +48,28 @@ class Login extends Component {
         this.setState({
           snackBarMsg: "Login Successfully !!",
           snackBarBtn: "Okay !!",
-          snackbarIsOpen: !this.state.snackbarIsOpen,
+          snackbarIsOpen: !this.state.snackbarIsOpen
         });
       })
       .catch(error => {
         console.log(error.code);
         if (error.code === "auth/invalid-email") {
           this.setState({
+            LoggingIn: false,
             snackBarMsg: "Invalid email address !!",
             snackBarBtn: "Okay !!",
             snackbarIsOpen: !this.state.snackbarIsOpen
           });
         } else if (error.code === "auth/wrong-password") {
           this.setState({
+            LoggingIn: false,
             snackBarMsg: "Invalid password !!",
             snackBarBtn: "Okay !!",
             snackbarIsOpen: !this.state.snackbarIsOpen
           });
         } else if (error.code === "auth/user-not-found") {
           this.setState({
+            LoggingIn: false,
             snackBarMsg: "User does not exist !!",
             snackBarBtn: "Okay !!",
             snackbarIsOpen: !this.state.snackbarIsOpen
@@ -196,16 +199,22 @@ class Login extends Component {
           }
         />
         <Dialog
-        open={this.state.LoggingIn}
-        fullWidth
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle style={{ textAlign: 'center' }}>Logging in...</DialogTitle>
-        <DialogContent style={{ textAlign: 'center' }}>
-          <CircularProgress style={{ color: '#ef5350' }} size={50} thickness={5} />
-        </DialogContent>
-      </Dialog>
+          open={this.state.LoggingIn}
+          fullWidth
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle style={{ textAlign: "center" }}>
+            Logging in...
+          </DialogTitle>
+          <DialogContent style={{ textAlign: "center" }}>
+            <CircularProgress
+              style={{ color: "#ef5350" }}
+              size={50}
+              thickness={5}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

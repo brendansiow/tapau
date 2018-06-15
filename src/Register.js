@@ -95,18 +95,21 @@ class Register extends Component {
         console.log(error);
         if (error.code === "auth/invalid-email") {
           this.setState({
+            SignUp :false,
             snackBarMsg: "Invalid email address !!",
             snackBarBtn: "Okay !!",
             snackbarIsOpen: !this.state.snackbarIsOpen
           });
         } else if (error.code === "auth/weak-password") {
           this.setState({
+            SignUp :false,
             snackBarMsg: "Weak password (> 6 characters)!",
             snackBarBtn: "Okay !!",
             snackbarIsOpen: !this.state.snackbarIsOpen
           });
         } else if (error.code === "auth/email-already-in-use") {
           this.setState({
+            SignUp :false,
             snackBarMsg: "Email already in used !",
             snackBarBtn: "Okay !!",
             snackbarIsOpen: !this.state.snackbarIsOpen
