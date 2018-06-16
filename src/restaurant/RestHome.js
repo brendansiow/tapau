@@ -1,72 +1,126 @@
-import React, { Component } from 'react';
-import QrReader from 'react-qr-reader'
-import { Button, Dialog, DialogContent, DialogTitle } from '@material-ui/core';
-
+import React, { Component } from "react";
+import QrReader from "react-qr-reader";
+import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
+import firebase from "../firebase";
+const db = firebase.firestore();
 class RestHome extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            delay: 100,
-            result: 'No result',
-            open: false
-        }
-        this.handleScan = this.handleScan.bind(this)
-        this.openDialog = this.openDialog.bind(this)
-        this.handleClose = this.handleClose.bind(this)
-    }
-    componentDidMount() {
-        this.props.setTitle("Home");
-    }
-    handleScan(data) {
-        if (data) {
-            this.setState({
-                result: data,
-            })
-        }
-    }
-    handleError(err) {
-        console.error(err)
-    }
-    handleClose() {
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: false,
+      orderlist:[]
+    };
+    this.handleScan = this.handleScan.bind(this);
+    this.openDialog = this.openDialog.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+  }
+  componentDidMount() {
+    this.props.setTitle("Home");
+    db.collection("order")
+      .where("restid", "==", this.props.loginuser.uid)
+      .onSnapshot(orders => {
+        var orderlist = [];
+        orders.forEach(order => {
+          orderlist.push({
+            orderid: order.id,
+            custid: order.data().custid,
+            restid: order.data().restid,
+            total: order.data().total,
+            foodlist: order.data().foodlist,
+            orderTime:
+              !order.data().orderTime || order.data().orderTime === ""
+                ? ""
+                : new Date(order.data().orderTime.seconds * 1000),
+            acceptedTime:
+              !order.data().acceptedTime || order.data().acceptedTime === ""
+                ? ""
+                : new Date(order.data().acceptedTime.seconds * 1000),
+            collectTime:
+              !order.data().collectTime || order.data().collectTime === ""
+                ? ""
+                : new Date(order.data().collectTime.seconds * 1000),
+            preparedTime:
+              !order.data().preparedTime || order.data().preparedTime === ""
+                ? ""
+                : new Date(order.data().preparedTime.seconds * 1000),
+            cancelledTime:
+              !order.data().cancelledTime || order.data().cancelledTime === ""
+                ? ""
+                : new Date(order.data().cancelledTime.seconds * 1000),
+            cancelSide: order.data().cancelSide
+          });
+        });
+        orderlist.sort(function(a, b) {
+          return new Date(b.orderTime) - new Date(a.orderTime);
+        });
         this.setState({
-            open: false,
+          orderlist: orderlist
+        });
+      });
+  }
+  handleScan(data) {
+    if (data) {
+        console.log(data);
+        this.state.orderlist.forEach(eachorder=>{
+            if(data === eachorder.orderid){
+                this.handleClose();
+                this.props.history.push("/rest/myorder?order=" + eachorder.orderid)
+            }
         })
+        this.handleClose();
+        console.log("not found")
     }
-    openDialog() {
-        this.setState({
-            open: true,
-        })
-    }
-    render() {
-        return (
-            <div style={{ paddingTop: "60px" }}>
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                    <Button variant="raised" style={{ backgroundColor: '#EF5350', color: "white", margin: '10px 10px 0px 0px' }}
-                        onClick={this.openDialog}
-                    >Scan QR code for customer order</Button>
-                </div>
-                <p style={{textAlign:'center'}}>{this.state.result}</p>
-                <Dialog
-                    open={this.state.open}
-                    onClose={this.handleClose}
-                    fullWidth
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle>Scan QR code below</DialogTitle>
-                    <DialogContent>
-                        <QrReader
-                            delay={this.state.delay}
-                            onError={this.handleError}
-                            onScan={this.handleScan}
-                            style={{ width: "100%" }}
-                            showViewFinder={false}
-                        />
-                    </DialogContent>
-                </Dialog>
-            </div>
-        );
-    }
+  }
+  handleError(err) {
+    console.error(err);
+  }
+  handleClose() {
+    this.setState({
+      open: false
+    });
+  }
+  openDialog() {
+    this.setState({
+      open: true
+    });
+  }
+  render() {
+    return (
+      <div style={{ paddingTop: "60px" }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="raised"
+            style={{
+              backgroundColor: "#EF5350",
+              color: "white",
+              margin: "10px 10px 0px 0px"
+            }}
+            onClick={this.openDialog}
+          >
+            Scan QR code for customer order
+          </Button>
+        </div>
+        <Dialog
+          open={this.state.open}
+          onClose={this.handleClose}
+          fullWidth
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>Scan QR code below</DialogTitle>
+          <DialogContent>
+            <QrReader
+              delay={0}
+              onError={this.handleError}
+              onScan={this.handleScan}
+              style={{ width: "100%" }}
+              showViewFinder={false}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
 }
 
 export default RestHome;

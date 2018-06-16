@@ -12,7 +12,7 @@ import CustProfile from './customer/CustProfile'
 import ViewRest from './customer/ViewRest'
 import {
   IconButton, AppBar, Typography, Toolbar, List, Divider, ListItem, ListItemText, Icon,
-  CircularProgress, Snackbar,Button, SwipeableDrawer
+  CircularProgress, Snackbar,SwipeableDrawer
 } from '@material-ui/core';
 import { Route, Link, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import firebase from './firebase';
@@ -219,16 +219,6 @@ class App extends Component {
           }}
           autoHideDuration={3000}
           message={<span id="message-id">{this.state.snackBarMsg}</span>}
-          action={
-            <Button
-              key="undo"
-              style={{ color: "#EF5350" }}
-              dense="true"
-              onClick={this.handleRequestClose}
-            >
-              Go
-            </Button>
-          }
         />
         <SwipeableDrawer open={this.state.open}  
         onOpen={() => this.setState({ open: true })} 

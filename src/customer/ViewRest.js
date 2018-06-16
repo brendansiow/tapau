@@ -113,7 +113,7 @@ class ViewRest extends Component {
         preparedTime: "",
         collectTime: "",
         cancelledTime: "",
-        cancelSide:""
+        cancelSide: ""
       })
       .then(result => {
         var notiToken = [];
@@ -138,7 +138,8 @@ class ViewRest extends Component {
                         title: "You have a new order!",
                         body: "From " + this.props.loginuser.name,
                         icon: "img/logo/logo72.png",
-                        click_action: "https://tapau.tk/rest/myorder"
+                        click_action:
+                          "https://tapau.tk/rest/myorder?order=" + result.id
                       },
                       to: eachToken
                     },
@@ -153,7 +154,7 @@ class ViewRest extends Component {
               });
             });
           });
-        this.props.history.push("/cust/mytapau");
+        this.props.history.push("/cust/mytapau?order=" + result.id);
       });
   };
   render() {

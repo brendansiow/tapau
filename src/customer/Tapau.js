@@ -39,7 +39,8 @@ class Tapau extends Component {
       ],
       open: false,
       tempOrder: "",
-      openCancelDialog: false
+      openCancelDialog: false,
+      activeOrder: new URLSearchParams(this.props.location.search).get('order')
     };
   }
   componentDidMount() {
@@ -328,7 +329,7 @@ class Tapau extends Component {
                           this.props.loginuser.name +
                           " cancelled the order placed !",
                         icon: "img/logo/logo72.png",
-                        click_action: "https://tapau.tk/cust/mytapau"
+                        click_action: "https://tapau.tk/rest/myorder?order="+result.id
                       },
                       to: eachToken
                     },
@@ -345,11 +346,11 @@ class Tapau extends Component {
           });
       });
   };
-  render() {
+  render() { 
     return (
       <div style={{ paddingTop: "60px" }}>
         {this.state.orderlist.map(order => (
-          <ExpansionPanel key={order.orderid}>
+          <ExpansionPanel key={order.orderid} defaultExpanded={order.orderid === this.state.activeOrder}>
             <ExpansionPanelSummary
               expandIcon={
                 <Icon style={{ color: "#ef5350 ", fontSize: "25px" }}>

@@ -31,7 +31,8 @@ class Order extends Component {
       openQR: false,
       QRCodeOrder: "",
       openCollectDialog: false,
-      openErrorDialog: false
+      openErrorDialog: false,
+      activeOrder: new URLSearchParams(this.props.location.search).get("order")
     };
   }
   componentDidMount() {
@@ -78,7 +79,6 @@ class Order extends Component {
                       ? ""
                       : new Date(order.data().cancelledTime.seconds * 1000),
                   cancelSide: order.data().cancelSide,
-                  activeStep: 1
                 });
               });
               orderlist.sort(function(a, b) {
@@ -247,7 +247,8 @@ class Order extends Component {
                         title: "You order has been accepted!",
                         body: "From " + this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
-                        click_action: "https://tapau.tk/cust/mytapau"
+                        click_action:
+                          "https://tapau.tk/cust/mytapau?order=" + order.orderid
                       },
                       to: eachToken
                     },
@@ -295,7 +296,8 @@ class Order extends Component {
                           "Please show your QRCode upon collection.From " +
                           this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
-                        click_action: "https://tapau.tk/cust/mytapau"
+                        click_action:
+                          "https://tapau.tk/cust/mytapau?order=" + order.orderid
                       },
                       to: eachToken
                     },
@@ -344,7 +346,9 @@ class Order extends Component {
                           "Thanks for choosing us! See You.From " +
                           this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
-                        click_action: "https://tapau.tk/cust/mytapau"
+                        click_action:
+                          "https://tapau.tk/cust/mytapau?order=" +
+                          this.state.QRCodeOrder
                       },
                       to: eachToken
                     },
@@ -361,59 +365,64 @@ class Order extends Component {
           });
       });
   };
-  updateCancel= order => event =>{
+  updateCancel = order => event => {
     db.collection("order")
-    .doc(order.orderid)
-    .update({
-      cancelledTime: firebase.firestore.FieldValue.serverTimestamp(),
-      cancelSide: "rest"
-    })
-    .then(result => {
-      var notiToken = [];
-      db.collection("user")
-        .where("uid", "==", order.custid)
-        .get()
-        .then(users => {
-          users.forEach(user => {
-            notiToken = user.data().notiToken;
-            var config = {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
-              }
-            };
-            notiToken.forEach(eachToken => {
-              axios
-                .post(
-                  "https://fcm.googleapis.com/fcm/send",
-                  {
-                    notification: {
-                      title: "Order is cancelled",
-                      body:
-                        "Sorry, we cant prepared your order right now! From: "+this.props.loginuser.restname ,
-                      icon: "img/logo/logo72.png",
-                      click_action: "https://tapau.tk/cust/mytapau"
+      .doc(order.orderid)
+      .update({
+        cancelledTime: firebase.firestore.FieldValue.serverTimestamp(),
+        cancelSide: "rest"
+      })
+      .then(result => {
+        var notiToken = [];
+        db.collection("user")
+          .where("uid", "==", order.custid)
+          .get()
+          .then(users => {
+            users.forEach(user => {
+              notiToken = user.data().notiToken;
+              var config = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "key=AIzaSyAf8VujthnxpjeyZL_zki8npcxaBhH-L_4"
+                }
+              };
+              notiToken.forEach(eachToken => {
+                axios
+                  .post(
+                    "https://fcm.googleapis.com/fcm/send",
+                    {
+                      notification: {
+                        title: "Order is cancelled",
+                        body:
+                          "Sorry, we cant prepared your order right now! From: " +
+                          this.props.loginuser.restname,
+                        icon: "img/logo/logo72.png",
+                        click_action:
+                          "https://tapau.tk/cust/mytapau?order=" + order.orderid
+                      },
+                      to: eachToken
                     },
-                    to: eachToken
-                  },
-                  config
-                )
-                .then(function(response) {
-                  console.log(response);
-                })
-                .catch(function(error) {
-                  console.log(error);
-                });
+                    config
+                  )
+                  .then(function(response) {
+                    console.log(response);
+                  })
+                  .catch(function(error) {
+                    console.log(error);
+                  });
+              });
             });
           });
-        });
-    });
-  }
+      });
+  };
   render() {
     return (
       <div style={{ paddingTop: "60px" }}>
         {this.state.orderlist.map(order => (
-          <ExpansionPanel key={order.orderid}>
+          <ExpansionPanel
+            key={order.orderid}
+            defaultExpanded={order.orderid === this.state.activeOrder}
+          >
             <ExpansionPanelSummary
               expandIcon={
                 <Icon style={{ color: "#ef5350 ", fontSize: "25px" }}>
