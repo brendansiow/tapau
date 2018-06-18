@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import QrReader from "react-qr-reader";
-import { Button, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
+import { Button, Dialog, DialogContent, DialogTitle,DialogActions,DialogContentText } from "@material-ui/core";
 import firebase from "../firebase";
 const db = firebase.firestore();
 class RestHome extends Component {
@@ -8,7 +8,8 @@ class RestHome extends Component {
     super(props);
     this.state = {
       open: false,
-      orderlist:[]
+      orderlist:[],
+      openErrorDialog: false
     };
     this.handleScan = this.handleScan.bind(this);
     this.openDialog = this.openDialog.bind(this);
@@ -16,7 +17,7 @@ class RestHome extends Component {
   }
   componentDidMount() {
     this.props.setTitle("Home");
-    db.collection("order")
+     db.collection("order")
       .where("restid", "==", this.props.loginuser.uid)
       .onSnapshot(orders => {
         var orderlist = [];
@@ -60,15 +61,21 @@ class RestHome extends Component {
   }
   handleScan(data) {
     if (data) {
-        console.log(data);
+        var flag = false;
         this.state.orderlist.forEach(eachorder=>{
             if(data === eachorder.orderid){
-                this.handleClose();
-                this.props.history.push("/rest/myorder?order=" + eachorder.orderid)
+               flag = true;
             }
         })
-        this.handleClose();
-        console.log("not found")
+        if(flag){
+          this.handleClose();
+          this.props.history.push("/rest/myorder?order=" + data)
+        }else{
+          this.handleClose();
+          this.setState({
+            openErrorDialog: true
+          })
+        }
     }
   }
   handleError(err) {
@@ -83,6 +90,11 @@ class RestHome extends Component {
     this.setState({
       open: true
     });
+  }
+  handleCloseDialog=()=>{
+    this.setState({
+      openErrorDialog: false
+    })
   }
   render() {
     return (
@@ -118,6 +130,25 @@ class RestHome extends Component {
             />
           </DialogContent>
         </Dialog>
+        <Dialog
+        open={this.state.openErrorDialog}
+        onClose={this.handleCloseDialog}
+        fullWidth
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        
+        <DialogContent>
+          <DialogContentText>
+            QRCode not found!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.handleCloseDialog} color="primary">
+            Okay
+          </Button>
+        </DialogActions>
+      </Dialog>
       </div>
     );
   }
