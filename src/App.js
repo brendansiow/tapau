@@ -150,12 +150,22 @@ class App extends Component {
     });
   }
   componentWillReceiveProps(props) {
-    if (props.history.action === "POP" && this.state.open) {
-      this.setState({
-        open: false
+      this.unblock = this.props.history.block((location, action) => {
+        if (this.state.open) {
+          if (action === "POP") {
+            this.setState({
+              open: false
+            });
+            this.unblock();
+            return false;
+          } else {
+            this.unblock();
+            return true;
+          }
+        }
+        this.unblock();
+        return true;
       });
-      this.props.history.push(this.props.location.pathname);
-    }
   }
   setTitle(title) {
     this.setState({

@@ -117,7 +117,7 @@ class About extends Component {
           with <Icon style={{ lineHeight: "1.3", color: "red" }}>favorite</Icon>{" "}
           by Tapau
         </h2>
-        <Typography variant="caption" style={{textAlign:"center"}}>Tapau v0.8 Beta</Typography>
+        <Typography variant="caption" style={{textAlign:"center"}}>Tapau v0.9 Beta</Typography>
         <Card style={{ marginTop: "20px", padding: "15px 20px 15px 20px" }}>
           <form onSubmit={this.handleSubmit}>
             <CardContent>
