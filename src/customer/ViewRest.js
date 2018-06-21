@@ -139,7 +139,7 @@ class ViewRest extends Component {
                         body: "From " + this.props.loginuser.name,
                         icon: "img/logo/logo72.png",
                         click_action:
-                          "https://tapau.tk/rest/myorder?order=" + result.id
+                          "https://tapau.tk/rest/myorder#"+  result.id
                       },
                       to: eachToken
                     },
@@ -154,7 +154,7 @@ class ViewRest extends Component {
               });
             });
           });
-        this.props.history.push("/cust/mytapau?order=" + result.id);
+        this.props.history.push("/cust/mytapau#"+ result.id);
       });
   };
   render() {

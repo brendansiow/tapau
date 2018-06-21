@@ -24,8 +24,7 @@ import {
   Snackbar,
   SwipeableDrawer
 } from "@material-ui/core";
-import { Route, Link, Redirect } from "react-router-dom";
-import { withRouter } from "react-router";
+import { Route, Link, Redirect, withRouter } from "react-router-dom";
 import firebase from "./firebase";
 const db = firebase.firestore();
 db.settings({ timestampsInSnapshots: true });
@@ -150,22 +149,22 @@ class App extends Component {
     });
   }
   componentWillReceiveProps(props) {
-      this.unblock = this.props.history.block((location, action) => {
-        if (this.state.open) {
-          if (action === "POP") {
-            this.setState({
-              open: false
-            });
-            this.unblock();
-            return false;
-          } else {
-            this.unblock();
-            return true;
-          }
+    this.unblock = this.props.history.block((location, action) => {
+      if (this.state.open) {
+        if (action === "POP") {
+          this.setState({
+            open: false
+          });
+          this.unblock();
+          return false;
+        } else {
+          this.unblock();
+          return true;
         }
-        this.unblock();
-        return true;
-      });
+      }
+      this.unblock();
+      return true;
+    });
   }
   setTitle(title) {
     this.setState({

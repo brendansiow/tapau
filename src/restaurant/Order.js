@@ -17,7 +17,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
+  ListSubheader
 } from "@material-ui/core";
 import QrReader from "react-qr-reader";
 import axios from "axios";
@@ -32,7 +33,9 @@ class Order extends Component {
       QRCodeOrder: "",
       openCollectDialog: false,
       openErrorDialog: false,
-      activeOrder: new URLSearchParams(this.props.location.search).get("order")
+      activeOrder: this.props.location.hash.slice(1),
+      activeOrders: [],
+      completedOrders: []
     };
   }
   componentDidMount() {
@@ -41,55 +44,86 @@ class Order extends Component {
       .where("restid", "==", this.props.loginuser.uid)
       .onSnapshot(orders => {
         var orderlist = [];
+        var activeOrders = [];
+        var completedOrders = [];
+        var promisearr = [];
         orders.forEach(order => {
-          db.collection("user")
-            .where("uid", "==", order.data().custid)
-            .get()
-            .then(cust => {
-              cust.forEach(eachcust => {
-                orderlist.push({
-                  orderid: order.id,
-                  custid: order.data().custid,
-                  restid: order.data().restid,
-                  custname: eachcust.data().name,
-                  custcontact: eachcust.data().contactno,
-                  total: order.data().total,
-                  foodlist: order.data().foodlist,
-                  orderTime:
-                    !order.data().orderTime || order.data().orderTime === ""
-                      ? ""
-                      : new Date(order.data().orderTime.seconds * 1000),
-                  acceptedTime:
-                    !order.data().acceptedTime ||
-                    order.data().acceptedTime === ""
-                      ? ""
-                      : new Date(order.data().acceptedTime.seconds * 1000),
-                  collectTime:
-                    !order.data().collectTime || order.data().collectTime === ""
-                      ? ""
-                      : new Date(order.data().collectTime.seconds * 1000),
-                  preparedTime:
-                    !order.data().preparedTime ||
-                    order.data().preparedTime === ""
-                      ? ""
-                      : new Date(order.data().preparedTime.seconds * 1000),
-                  cancelledTime:
-                    !order.data().cancelledTime ||
-                    order.data().cancelledTime === ""
-                      ? ""
-                      : new Date(order.data().cancelledTime.seconds * 1000),
-                  cancelSide: order.data().cancelSide,
+          promisearr.push(
+            new Promise((resolve, reject) => {
+              db.collection("user")
+                .where("uid", "==", order.data().custid)
+                .get()
+                .then(cust => {
+                  cust.forEach(eachcust => {
+                    orderlist.push({
+                      orderid: order.id,
+                      custid: order.data().custid,
+                      restid: order.data().restid,
+                      custname: eachcust.data().name,
+                      custcontact: eachcust.data().contactno,
+                      total: order.data().total,
+                      foodlist: order.data().foodlist,
+                      orderTime:
+                        !order.data().orderTime || order.data().orderTime === ""
+                          ? ""
+                          : new Date(order.data().orderTime.seconds * 1000),
+                      acceptedTime:
+                        !order.data().acceptedTime ||
+                        order.data().acceptedTime === ""
+                          ? ""
+                          : new Date(order.data().acceptedTime.seconds * 1000),
+                      collectTime:
+                        !order.data().collectTime ||
+                        order.data().collectTime === ""
+                          ? ""
+                          : new Date(order.data().collectTime.seconds * 1000),
+                      preparedTime:
+                        !order.data().preparedTime ||
+                        order.data().preparedTime === ""
+                          ? ""
+                          : new Date(order.data().preparedTime.seconds * 1000),
+                      cancelledTime:
+                        !order.data().cancelledTime ||
+                        order.data().cancelledTime === ""
+                          ? ""
+                          : new Date(order.data().cancelledTime.seconds * 1000),
+                      cancelSide: order.data().cancelSide
+                    });
+                    resolve();
+                  });
                 });
-              });
-              orderlist.sort(function(a, b) {
-                return new Date(b.orderTime) - new Date(a.orderTime);
-              });
-              this.setState({
-                orderlist: orderlist
-              });
-            });
+            })
+          );
+        });
+        Promise.all(promisearr).then(() => {
+          while (orderlist.length > 0) {
+            if (
+              orderlist[orderlist.length - 1].cancelledTime !== "" ||
+              orderlist[orderlist.length - 1].collectTime !== ""
+            ) {
+              completedOrders.push(orderlist.splice(orderlist.length - 1)[0]);
+            } else {
+              activeOrders.push(orderlist.splice(orderlist.length - 1)[0]);
+            }
+          }
+          activeOrders.sort(function(a, b) {
+            return new Date(b.orderTime) - new Date(a.orderTime);
+          });
+          completedOrders.sort(function(a, b) {
+            return new Date(b.orderTime) - new Date(a.orderTime);
+          });
+          this.setState({
+            activeOrders: activeOrders,
+            completedOrders: completedOrders
+          });
         });
       });
+  }
+  componentDidUpdate() {
+    let anchorElement = document.getElementById(this.state.activeOrder);
+    if (anchorElement) {
+      anchorElement.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
   }
   StatusSection = order => {
     if (order.cancelledTime) {
@@ -248,7 +282,7 @@ class Order extends Component {
                         body: "From " + this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
                         click_action:
-                          "https://tapau.tk/cust/mytapau?order=" + order.orderid
+                          "https://tapau.tk/cust/mytapau#" + order.orderid
                       },
                       to: eachToken
                     },
@@ -297,7 +331,7 @@ class Order extends Component {
                           this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
                         click_action:
-                          "https://tapau.tk/cust/mytapau?order=" + order.orderid
+                          "https://tapau.tk/cust/mytapau#" + order.orderid
                       },
                       to: eachToken
                     },
@@ -347,7 +381,7 @@ class Order extends Component {
                           this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
                         click_action:
-                          "https://tapau.tk/cust/mytapau?order=" +
+                          "https://tapau.tk/cust/mytapau#" +
                           this.state.QRCodeOrder
                       },
                       to: eachToken
@@ -398,7 +432,7 @@ class Order extends Component {
                           this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
                         click_action:
-                          "https://tapau.tk/cust/mytapau?order=" + order.orderid
+                          "https://tapau.tk/cust/mytapau#" + order.orderid
                       },
                       to: eachToken
                     },
@@ -418,8 +452,99 @@ class Order extends Component {
   render() {
     return (
       <div style={{ paddingTop: "60px" }}>
-        {this.state.orderlist.map(order => (
+        <ListSubheader style={{ fontSize: "15px" }}>
+          Active Orders
+        </ListSubheader>
+        {this.state.activeOrders.map(order => (
           <ExpansionPanel
+            id={order.orderid}
+            key={order.orderid}
+            defaultExpanded={order.orderid === this.state.activeOrder}
+          >
+            <ExpansionPanelSummary
+              expandIcon={
+                <Icon style={{ color: "#ef5350 ", fontSize: "25px" }}>
+                  expand_more
+                </Icon>
+              }
+            >
+              <Grid container spacing={24}>
+                <Grid item xs={12} style={{ paddingBottom: "0" }}>
+                  <Typography variant="title">
+                    {order.custname + " "}
+                  </Typography>
+                </Grid>
+                {order.orderTime && (
+                  <Grid item xs={12} style={{ paddingTop: "0" }}>
+                    <Typography variant="subheading">
+                      {" "}
+                      {order.orderTime.getDate() +
+                        "-" +
+                        (order.orderTime.getMonth() + 1) +
+                        "-" +
+                        order.orderTime.getFullYear()}
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails
+              style={{
+                display: "block",
+                paddingTop: "0px",
+                paddingBottom: "0px"
+              }}
+            >
+              <h3 style={{ margin: "0" }}>
+                Status: {this.StatusSection(order)}
+              </h3>
+              <h3 style={{ margin: "0" }}>Food Ordered:</h3>
+              <List>
+                {order.foodlist.map(food => (
+                  <div key={food.foodid}>
+                    <ListItem>
+                      <ListItemText
+                        primary={food.foodname}
+                        style={{
+                          minWidth: "120px",
+                          flex: "none",
+                          maxWidth: "170px",
+                          textOverflow: "ellipsis",
+                          overflow: "hidden"
+                        }}
+                      />
+                      <span>x {food.count}</span>
+                      <ListItemSecondaryAction>
+                        {food.foodprice}
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                    <Divider />
+                  </div>
+                ))}
+                <ListItem>
+                  <ListItemText
+                    primary={
+                      <Typography variant="subheading">
+                        Total Amount :
+                      </Typography>
+                    }
+                  />
+                  <ListItemSecondaryAction>
+                    {order.total}
+                  </ListItemSecondaryAction>
+                </ListItem>
+              </List>
+            </ExpansionPanelDetails>
+            <Divider />
+            {this.ButtonSection(order)}
+          </ExpansionPanel>
+        ))}
+        <ListSubheader style={{ fontSize: "15px" }}>
+          Completed Orders
+        </ListSubheader>
+        {this.state.completedOrders.map(order => (
+          <ExpansionPanel
+            id={order.orderid}
             key={order.orderid}
             defaultExpanded={order.orderid === this.state.activeOrder}
           >
