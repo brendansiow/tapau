@@ -23,7 +23,6 @@ class CustViewMenu extends Component {
     super(props);
     this.state = {
       expansionPanelOpen: false,
-      restaurant: [],
       menu: [],
       foodlist: [],
       cart: [],
@@ -31,7 +30,18 @@ class CustViewMenu extends Component {
     };
   }
   componentDidMount() {
-    this.props.setTitle(this.props.location.state.restname);
+    db.collection("restaurant")
+      .doc(this.props.match.params.restid)
+      .get()
+      .then(doc => {
+        this.props.setTitle(doc.data().name);
+        this.setState({
+          restaurant: doc.data()
+        });
+      })
+      .catch(function(error) {
+        console.log("Error getting documents: ", error);
+      });
     //get menu
     db.collection("menu")
       .where("rid", "==", this.props.match.params.restid)

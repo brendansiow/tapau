@@ -46,7 +46,7 @@ class CustHome extends Component {
               <CardActions
                 style={{ display: "flex", justifyContent: "flex-end" }}
               >
-              <Link to={{pathname:`/cust/restmenu/${rest.id}`,state:{restname:rest.name}}} style={{ textDecoration: "none" }}>
+              <Link to={{pathname:`/cust/restmenu/${rest.id}`}} style={{ textDecoration: "none" }}>
                   <Button style={{ color: "#ef5350" }}>
                     View Food Menu
                     <Icon style={{ color: "#ef5350" }}>chevron_right</Icon>

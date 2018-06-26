@@ -69,7 +69,7 @@ class RestHome extends Component {
                 : new Date(order.data().cancelledTime.seconds * 1000),
             cancelSide: order.data().cancelSide
           });
-          if(!order.data().cancelledTime || order.data().cancelledTime === ""){
+          if((!order.data().cancelledTime || order.data().cancelledTime === "") && (order.data().collectTime || !order.data().collectTime  === "")){
             totalOrder++;
           }
           if((!order.data().cancelledTime || order.data().cancelledTime === "") && (!order.data().collectTime || order.data().collectTime  === "")){
@@ -187,7 +187,7 @@ class RestHome extends Component {
                 check_circle
               </Icon>
             </p>
-            <h3 style={{marginTop:"0"}}>Total Orders</h3>
+            <h3 style={{marginTop:"0"}}>Completed Orders</h3>
             <h2>{this.state.totalOrder}</h2>
           </GridListTile>
           <GridListTile key={"totalRevenue"} cols={1} style={{ textAlign: "center" }}>

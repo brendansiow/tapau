@@ -53,7 +53,8 @@ class CustProfile extends Component {
       });
     }
   };
-  handleUpdate = () => {
+  handleUpdate = e => {
+    e.preventDefault();
     db.collection("user")
       .doc(this.state.id)
       .update({
@@ -70,7 +71,8 @@ class CustProfile extends Component {
         console.log(error);
       });
   };
-  changePassword = () => {
+  changePassword = e => {
+    e.preventDefault();
     if (this.state.newpw === this.state.cnewpw) {
       var user = firebase.auth().currentUser;
       user
@@ -94,11 +96,20 @@ class CustProfile extends Component {
                   });
             })
             .catch(error=> {
+              console.log(error)
+              if(error.code === "auth/weak-password"){
+                this.setState({
+                  snackBarMsg: "Password must be > 6 !",
+                  snackBarBtn: "Okay !!",
+                  snackbarIsOpen: !this.state.snackbarIsOpen
+                });
+              }else{
                 this.setState({
                     snackBarMsg: "Update Password Failed!",
                     snackBarBtn: "Okay !!",
                     snackbarIsOpen: !this.state.snackbarIsOpen
                   });
+                }
             });
         })
         .catch(error => {
@@ -120,6 +131,7 @@ class CustProfile extends Component {
     return (
       <div style={{ paddingTop: "60px" }}>
         <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
+        <form onSubmit={this.handleUpdate}>
           <CardContent>
             <h2 style={{ margin: "0px", textAlign: "center" }}>My Profile</h2>
             <TextField
@@ -137,21 +149,24 @@ class CustProfile extends Component {
               onChange={this.handleChange}
               value={this.state.name}
               fullWidth
+              required
             />
           </CardContent>
           <CardActions style={{ display: "flex", justifyContent: "center" }}>
             <Button
+              type="submit"
               variant="raised"
               style={{
                 backgroundColor: "#EF5350",
                 color: "white",
                 margin: "10px 10px 0px 0px"
               }}
-              onClick={this.handleUpdate}
             >
               Update
             </Button>
           </CardActions>
+          </form>
+          <form onSubmit={this.changePassword }>
           <CardContent>
             <h2 style={{ margin: "0px", textAlign: "center" }}>
               Change password
@@ -163,6 +178,7 @@ class CustProfile extends Component {
               type="password"
               onChange={this.handleChange}
               value={this.state.oldpw}
+              required
               fullWidth
             />
             <TextField
@@ -173,6 +189,7 @@ class CustProfile extends Component {
               onChange={this.handleChange}
               value={this.state.newpw}
               fullWidth
+              required
             />
             <TextField
               id="cnewpw"
@@ -182,21 +199,23 @@ class CustProfile extends Component {
               onChange={this.handleChange}
               value={this.state.cnewpw}
               fullWidth
+              required
             />
           </CardContent>
           <CardActions style={{ display: "flex", justifyContent: "center" }}>
             <Button
+              type="submit"
               variant="raised"
               style={{
                 backgroundColor: "#EF5350",
                 color: "white",
                 margin: "10px 10px 0px 0px"
               }}
-              onClick={this.changePassword}
             >
               Change Password
             </Button>
           </CardActions>
+          </form>
         </Card>
         <Snackbar
           anchorOrigin={{
