@@ -18,7 +18,7 @@ import {
 import axios from "axios";
 import firebase from "../firebase";
 const db = firebase.firestore();
-class ViewRest extends Component {
+class CustViewMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -31,19 +31,7 @@ class ViewRest extends Component {
     };
   }
   componentDidMount() {
-    //get this restaurant details
-    db.collection("restaurant")
-      .doc(this.props.match.params.restid)
-      .get()
-      .then(doc => {
-        this.setState({
-          restaurant: doc.data()
-        });
-        this.props.setTitle(this.state.restaurant.name);
-      })
-      .catch(function(error) {
-        console.log("Error getting documents: ", error);
-      });
+    this.props.setTitle(this.props.location.state.restname);
     //get menu
     db.collection("menu")
       .where("rid", "==", this.props.match.params.restid)
@@ -331,4 +319,4 @@ class ViewRest extends Component {
   }
 }
 
-export default ViewRest;
+export default CustViewMenu;

@@ -27,7 +27,7 @@ import QRCode from "qrcode.react";
 import axios from "axios";
 import firebase from "../firebase";
 const db = firebase.firestore();
-class Tapau extends Component {
+class Takeaway extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -635,4 +635,4 @@ class Tapau extends Component {
   }
 }
 
-export default Tapau;
+export default Takeaway;

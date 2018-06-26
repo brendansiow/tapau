@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import firebase from "../firebase";
 const db = firebase.firestore();
-class RestaurantProfile extends Component {
+class RestProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -158,4 +158,4 @@ class RestaurantProfile extends Component {
   }
 }
 
-export default RestaurantProfile;
+export default RestProfile;

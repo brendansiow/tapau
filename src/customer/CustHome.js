@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { CardContent, Card, CardActions, Icon, Button } from "@material-ui/core";
+import { CardContent, Card, CardActions, Icon, Button, Typography } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import firebase from "../firebase";
 const db = firebase.firestore();
@@ -38,13 +38,15 @@ class CustHome extends Component {
               key={rest.id}
             >
               <CardContent>
-                <h3 style={{ marginTop: "10px" }}>{rest.name}</h3>
-                {rest.address}
+                <Typography variant="title" style={{ marginTop: "10px" }}>{rest.name}</Typography>
+                <p>{rest.address}</p>
+                <p>Contact No: {rest.contactno}</p>
+                <p>Website: {rest.website}</p>
               </CardContent>
               <CardActions
                 style={{ display: "flex", justifyContent: "flex-end" }}
               >
-              <Link to={`/cust/restmenu/${rest.id}`}  style={{ textDecoration: "none" }}>
+              <Link to={{pathname:`/cust/restmenu/${rest.id}`,state:{restname:rest.name}}} style={{ textDecoration: "none" }}>
                   <Button style={{ color: "#ef5350" }}>
                     View Food Menu
                     <Icon style={{ color: "#ef5350" }}>chevron_right</Icon>

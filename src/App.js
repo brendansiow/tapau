@@ -5,11 +5,11 @@ import Register from "./Register";
 import Order from "./restaurant/Order";
 import CustHome from "./customer/CustHome";
 import RestHome from "./restaurant/RestHome";
-import RestaurantProfile from "./restaurant/RestaurantProfile";
+import RestProfile from "./restaurant/RestProfile";
 import Menu from "./restaurant/Menu";
-import Tapau from "./customer/Tapau";
+import Takeaway from "./customer/Takeaway";
 import CustProfile from "./customer/CustProfile";
-import ViewRest from "./customer/ViewRest";
+import CustViewMenu from "./customer/CustViewMenu";
 import {
   IconButton,
   AppBar,
@@ -456,13 +456,13 @@ class App extends Component {
         />
         <CustRoute
           path="/cust/restmenu/:restid"
-          component={ViewRest}
+          component={CustViewMenu}
           setTitle={this.setTitle.bind(this)}
           loginuser={this.state.loginuser}
         />
         <CustRoute
           path="/cust/mytapau"
-          component={Tapau}
+          component={Takeaway}
           setTitle={this.setTitle.bind(this)}
           loginuser={this.state.loginuser}
         />
@@ -486,7 +486,7 @@ class App extends Component {
         />
         <RestRoute
           path="/rest/myrestaurant"
-          component={RestaurantProfile}
+          component={RestProfile}
           setTitle={this.setTitle.bind(this)}
           loginuser={this.state.loginuser}
         />
