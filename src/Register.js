@@ -92,7 +92,6 @@ class Register extends Component {
           });
       })
       .catch(error => {
-        console.log(error);
         if (error.code === "auth/invalid-email") {
           this.setState({
             SignUp :false,
@@ -130,6 +129,7 @@ class Register extends Component {
                 id="name"
                 label="Name"
                 margin="normal"
+                type="text"
                 required
                 onChange={this.handleChange}
                 value={this.state.name}
@@ -204,13 +204,14 @@ class Register extends Component {
                     required
                     fullWidth
                     onChange={this.handleChange}
-                    helperText="Password should contain 6 or more characters!"
                     value={this.state.contactno}
                   />
                   <TextField
                     id="website"
                     label="Website / Facebook Page"
                     margin="normal"
+                    type="url"
+                    helperText="eg:https://tapau.tk"
                     required
                     fullWidth
                     onChange={this.handleChange}

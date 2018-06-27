@@ -13,7 +13,11 @@ import {
   ExpansionPanelDetails,
   Icon,
   Button,
-  Badge
+  Badge,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  CircularProgress
 } from "@material-ui/core";
 import axios from "axios";
 import firebase from "../firebase";
@@ -26,7 +30,8 @@ class CustViewMenu extends Component {
       menu: [],
       foodlist: [],
       cart: [],
-      total: "0.00"
+      total: "0.00",
+      ordering: false
     };
   }
   componentDidMount() {
@@ -40,7 +45,7 @@ class CustViewMenu extends Component {
         });
       })
       .catch(function(error) {
-        console.log("Error getting documents: ", error);
+        console.log(error);
       });
     //get menu
     db.collection("menu")
@@ -100,6 +105,9 @@ class CustViewMenu extends Component {
     });
   };
   addOrder = () => {
+    this.setState({
+      ordering: true
+    });
     db.collection("order")
       .add({
         custid: this.props.loginuser.uid,
@@ -133,11 +141,11 @@ class CustViewMenu extends Component {
                     "https://fcm.googleapis.com/fcm/send",
                     {
                       notification: {
-                        title: "You have a new order!",
+                        title: "You have a new order !",
                         body: "From " + this.props.loginuser.name,
                         icon: "img/logo/logo72.png",
                         click_action:
-                          "https://tapau.tk/rest/myorder#"+  result.id
+                          "https://tapau.tk/rest/myorder#" + result.id
                       },
                       to: eachToken
                     },
@@ -152,7 +160,7 @@ class CustViewMenu extends Component {
               });
             });
           });
-        this.props.history.push("/cust/mytapau#"+ result.id);
+        this.props.history.push("/cust/mytapau#" + result.id);
       });
   };
   render() {
@@ -324,6 +332,23 @@ class CustViewMenu extends Component {
             )}
           </ExpansionPanelDetails>
         </ExpansionPanel>
+        <Dialog
+          open={this.state.ordering}
+          fullWidth
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle style={{ textAlign: "center" }}>
+            Placing your order...
+          </DialogTitle>
+          <DialogContent style={{ textAlign: "center" }}>
+            <CircularProgress
+              style={{ color: "#ef5350" }}
+              size={50}
+              thickness={5}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

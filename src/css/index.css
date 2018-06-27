@@ -6,9 +6,19 @@ body {
 h1 {
   font-family: "Circular Std Black" !important;
 }
-h2,h3,h4 {
+h2,
+h3,
+h4 {
   font-family: "Circular Std Bold" !important;
 }
 p {
   font-family: "Circular Std Book" !important;
+}
+.badge-position {
+  top: 7px !important;
+  right: 0px !important;
+  width: 10px !important;
+  height:10px !important;
+  background-color: white !important;
+  color: #ef5350 !important;
 }

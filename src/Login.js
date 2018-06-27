@@ -52,7 +52,6 @@ class Login extends Component {
         });
       })
       .catch(error => {
-        console.log(error.code);
         if (error.code === "auth/invalid-email") {
           this.setState({
             LoggingIn: false,

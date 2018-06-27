@@ -378,14 +378,14 @@ class Takeaway extends Component {
                     "https://fcm.googleapis.com/fcm/send",
                     {
                       notification: {
-                        title: "Order is cancelled",
+                        title: "Order is cancelled !",
                         body:
                           this.props.loginuser.name +
                           " cancelled the order placed !",
                         icon: "img/logo/logo72.png",
                         click_action:
                           "https://tapau.tk/rest/myorder#" +
-                          this.state.tempOrder.restid
+                          this.state.tempOrder.orderid
                       },
                       to: eachToken
                     },

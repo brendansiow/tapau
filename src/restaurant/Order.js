@@ -278,7 +278,7 @@ class Order extends Component {
                     "https://fcm.googleapis.com/fcm/send",
                     {
                       notification: {
-                        title: "You order has been accepted!",
+                        title: "You order has been accepted !",
                         body: "From " + this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
                         click_action:
@@ -325,9 +325,9 @@ class Order extends Component {
                     "https://fcm.googleapis.com/fcm/send",
                     {
                       notification: {
-                        title: "You order is ready to collect!",
+                        title: "You order is ready to collect !",
                         body:
-                          "Please show your QRCode upon collection.From " +
+                          "Please show your QRCode upon collection. From " +
                           this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
                         click_action:
@@ -375,9 +375,9 @@ class Order extends Component {
                     "https://fcm.googleapis.com/fcm/send",
                     {
                       notification: {
-                        title: "You have collected your order!",
+                        title: "You have collected your order !",
                         body:
-                          "Thanks for choosing us! See You.From " +
+                          "Thanks for choosing us ! See You.From " +
                           this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
                         click_action:
@@ -426,9 +426,9 @@ class Order extends Component {
                     "https://fcm.googleapis.com/fcm/send",
                     {
                       notification: {
-                        title: "Order is cancelled",
+                        title: "Order is cancelled !",
                         body:
-                          "Sorry, we cant prepared your order right now! From: " +
+                          "Sorry, we cant prepared your order right now ! From: " +
                           this.props.loginuser.restname,
                         icon: "img/logo/logo72.png",
                         click_action:

@@ -22,7 +22,10 @@ import {
   Icon,
   CircularProgress,
   Snackbar,
-  SwipeableDrawer
+  SwipeableDrawer,
+  Menu as MenuUI,
+  ListItemSecondaryAction,
+  Badge
 } from "@material-ui/core";
 import { Route, Link, Redirect, withRouter } from "react-router-dom";
 import firebase from "./firebase";
@@ -40,7 +43,10 @@ class App extends Component {
       loggedOut: false,
       snackbarIsOpen: false,
       snackBarMsg: "",
-      token: ""
+      token: "",
+      notification: [],
+      anchorEl: null,
+      seen:true
     };
   }
   componentDidMount() {
@@ -142,9 +148,13 @@ class App extends Component {
     const msg = firebase.messaging();
     msg.onMessage(payload => {
       console.log(payload);
+      let notiarr = this.state.notification;
+      notiarr.unshift(payload.notification);
       this.setState({
+        notification: notiarr,
         snackbarIsOpen: true,
-        snackBarMsg: payload.notification.title
+        snackBarMsg: payload.notification.title,
+        seen:false,
       });
     });
   }
@@ -217,6 +227,13 @@ class App extends Component {
         console.log(error);
       });
   };
+  handleOpenNoti = event => {
+    this.setState({ anchorEl: event.currentTarget, seen:true });
+  };
+  handleClose = () => {
+    this.setState({ anchorEl: null });
+  };
+
   render() {
     const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
     if (this.state.isAuthenticating) {
@@ -271,8 +288,90 @@ class App extends Component {
             >
               {this.state.title}
             </Typography>
+            {this.state.loginuser &&
+              (this.state.notification.length > 0 && !this.state.seen ? (
+                <Badge
+                  badgeContent=""
+                  color="primary"
+                  classes={{
+                    badge: "badge-position"
+                  }}
+                >
+                  <IconButton
+                    style={{ marginLeft: "5px" }}
+                    color="inherit"
+                    aria-label="notification"
+                    onClick={this.handleOpenNoti}
+                  >
+                    <Icon>notifications_active</Icon>
+                  </IconButton>
+                </Badge>
+              ) : (
+                <IconButton
+                  style={{ marginLeft: "5px" }}
+                  color="inherit"
+                  aria-label="notification"
+                  onClick={this.handleOpenNoti}
+                >
+                  <Icon>notifications</Icon>
+                </IconButton>
+              ))}
           </Toolbar>
         </AppBar>
+        <MenuUI
+          id="notification-menu"
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handleClose}
+        >
+          <List style={{ padding: "0px", outline: "none" }}>
+            <h2
+              style={{
+                textAlign: "center",
+                marginLeft: "20px",
+                marginRight: "20px"
+              }}
+            >
+              Notifications
+            </h2>
+            {this.state.notification.length < 1 && (
+              <React.Fragment>
+                <Divider />
+                <ListItem>
+                  <ListItemText
+                    style={{ paddingLeft: "16px" }}
+                    primary="You have no notification now !"
+                  />
+                </ListItem>
+              </React.Fragment>
+            )}
+            {this.state.notification.map((noti, index) => (
+              <React.Fragment key={index}>
+                <Divider />
+                <Link
+                  key={index}
+                  to={noti.click_action.substring(16, noti.click_action.length)}
+                  style={{ textDecoration: "none" }}
+                >
+                  <ListItem button onClick={this.handleClose}>
+                    <ListItemText primary={noti.title + " " + noti.body} />
+                    <ListItemSecondaryAction>
+                      <Icon
+                        style={{
+                          fontSize: "30px",
+                          lineHeight: "1.2",
+                          color: "#ef5350"
+                        }}
+                      >
+                        keyboard_arrow_right
+                      </Icon>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </Link>
+              </React.Fragment>
+            ))}
+          </List>
+        </MenuUI>
         <Snackbar
           anchorOrigin={{
             vertical: "top",

@@ -34,7 +34,7 @@ class CustProfile extends Component {
         });
       })
       .catch(function(error) {
-        console.log("Error getting documents: ", error);
+        console.log(error);
       });
   }
   handleRequestClose = e => {
@@ -96,7 +96,6 @@ class CustProfile extends Component {
                   });
             })
             .catch(error=> {
-              console.log(error)
               if(error.code === "auth/weak-password"){
                 this.setState({
                   snackBarMsg: "Password must be > 6 !",
@@ -188,6 +187,7 @@ class CustProfile extends Component {
               type="password"
               onChange={this.handleChange}
               value={this.state.newpw}
+              helperText="Password should contain 6 or more characters!"
               fullWidth
               required
             />
@@ -196,6 +196,7 @@ class CustProfile extends Component {
               label="Confirmation Password"
               margin="normal"
               type="password"
+              helperText="Password should match above!"
               onChange={this.handleChange}
               value={this.state.cnewpw}
               fullWidth
