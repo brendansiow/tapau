@@ -131,6 +131,10 @@ class Register extends Component {
                 margin="normal"
                 type="text"
                 required
+                inputProps={{
+                  autoComplete:"off",
+                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$"
+                }}
                 onChange={this.handleChange}
                 value={this.state.name}
                 fullWidth
@@ -141,6 +145,9 @@ class Register extends Component {
                 margin="normal"
                 type="email"
                 required
+                inputProps={{
+                  autoComplete:"off"
+                }}
                 onChange={this.handleChange}
                 value={this.state.email}
                 fullWidth
@@ -182,6 +189,10 @@ class Register extends Component {
                     label="Restaurant Name"
                     margin="normal"
                     required
+                    inputProps={{
+                      autoComplete:"off",
+                      pattern:"[^-\\s][a-zA-Z0-9-\\s]+[a-zA-Z0-9-]+$"
+                    }}
                     onChange={this.handleChange}
                     value={this.state.restaurantname}
                     fullWidth
@@ -192,6 +203,9 @@ class Register extends Component {
                     margin="normal"
                     required
                     multiline
+                    inputProps={{
+                      autoComplete:"off"
+                    }}
                     rows="3"
                     onChange={this.handleChange}
                     value={this.state.address}
@@ -202,6 +216,10 @@ class Register extends Component {
                     label="Contact Number"
                     margin="normal"
                     required
+                    inputProps={{
+                      autoComplete:"off",
+                      pattern:"[^-\\s][0-9-]+$"
+                    }}
                     fullWidth
                     onChange={this.handleChange}
                     value={this.state.contactno}
@@ -214,6 +232,9 @@ class Register extends Component {
                     helperText="eg:https://tapau.tk"
                     required
                     fullWidth
+                    inputProps={{
+                      autoComplete:"off"
+                    }}
                     onChange={this.handleChange}
                     value={this.state.website}
                   />

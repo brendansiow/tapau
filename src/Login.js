@@ -130,9 +130,13 @@ class Login extends Component {
                 id="email"
                 label="Email"
                 margin="normal"
+                type="email"
                 required
                 onChange={this.handleChange}
                 value={this.state.email}
+                inputProps={{
+                  autoComplete:"off",
+                }}
                 fullWidth
               />
               <TextField

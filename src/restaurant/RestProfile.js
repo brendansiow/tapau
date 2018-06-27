@@ -145,6 +145,10 @@ class RestProfile extends Component {
               type="text"
               label="Restaurant Name"
               margin="normal"
+              inputProps={{
+                autoComplete:"off",
+                pattern:"[^-\\s][a-zA-Z0-9-\\s]+[a-zA-Z0-9-]+$"
+              }}
               onChange={this.handleChange}
               value={this.state.name}
               required
@@ -157,6 +161,9 @@ class RestProfile extends Component {
               margin="normal"
               rows="3"
               multiline
+              inputProps={{
+                autoComplete:"off"
+              }}
               onChange={this.handleChange}
               value={this.state.address}
               required
@@ -167,6 +174,10 @@ class RestProfile extends Component {
               label="Contact Number"
               margin="normal"
               fullWidth
+              inputProps={{
+                autoComplete:"off",
+                pattern:"[^-\\s][0-9-]+$"
+              }}
               onChange={this.handleChange}
               value={this.state.contactno}
               required

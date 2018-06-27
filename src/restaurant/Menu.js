@@ -280,13 +280,10 @@ class Menu extends Component {
                 title={<h3 style={{ margin: "0" }}>{item.menuname}</h3>}
               />
               <CardContent style={{ paddingTop: "0px" }}>
-                <IconButton
-                  style={{ fontSize: "20px" }}
-                  onClick={this.openAddFoodDialog(item.id)}
-                >
-                  <Icon style={{ color: "#ef5350" }}>add</Icon>
-                  Add
-                </IconButton>
+                <Button style={{ fontSize: "18px",textTransform:"none",color:"grey",padding:"0"}} onClick={this.openAddFoodDialog(item.id)}>
+                <Icon style={{ color: "#ef5350" }}>add</Icon>
+                Add Item
+                </Button>
                 <List>
                   {this.state.foodlist.map(food => {
                     return item.id === food.menuid ? (
@@ -325,6 +322,10 @@ class Menu extends Component {
                 autoFocus
                 margin="dense"
                 id="createmenu"
+                inputProps={{
+                  autoComplete:"off",
+                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$"
+                }}
                 label="Menu Name"
                 onChange={this.handleChange}
                 value={this.state.createmenu}
@@ -358,6 +359,10 @@ class Menu extends Component {
                 margin="dense"
                 id="foodname"
                 label="Food Name"
+                inputProps={{
+                  autoComplete:"off",
+                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$"
+                }}
                 onChange={this.handleChange}
                 value={this.state.foodname}
                 fullWidth

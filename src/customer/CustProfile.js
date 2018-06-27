@@ -144,6 +144,10 @@ class CustProfile extends Component {
             <TextField
               id="name"
               label="Name"
+              inputProps={{
+                autoComplete:"off",
+                pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$"
+              }}
               margin="normal"
               onChange={this.handleChange}
               value={this.state.name}

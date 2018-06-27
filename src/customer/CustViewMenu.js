@@ -323,7 +323,7 @@ class CustViewMenu extends Component {
               <h2
                 style={{
                   margin: "0",
-                  paddingTop: "10px",
+                  paddingTop: "20px",
                   textAlign: "center"
                 }}
               >

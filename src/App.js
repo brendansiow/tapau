@@ -400,20 +400,19 @@ class App extends Component {
           disableBackdropTransition={!iOS}
           disableDiscovery={iOS}
         >
-          <div tabIndex={0} role="button" style={{ width: "250px" }}>
-            <List style={{ backgroundColor: "#ef5350" }}>
-              <ListItem>
-                <ListItemText
-                  style={{ color: "white", fontSize: "23px" }}
-                  primary="Welcome to Tapau"
-                  disableTypography
-                />
-              </ListItem>
-            </List>
-            <Divider />
+          <List style={{backgroundColor: "#ef5350"}}>
+          <ListItem>
+          <ListItemText
+            style={{ color: "white", fontSize: "23px" }}
+            primary="Welcome to Tapau"
+            disableTypography
+          />
+        </ListItem>
+          </List>
             <List
-              onClick={() => this.setState({ open: false })}
+            onClick={() => this.setState({ open: false })}
               onKeyDown={() => this.setState({ open: false })}
+              style={{ outline: "none"}}
             >
               {!this.state.loginuser ? (
                 <Link to="/" style={{ textDecoration: "none" }}>
@@ -533,7 +532,6 @@ class App extends Component {
                 </ListItem>
               )}
             </List>
-          </div>
         </SwipeableDrawer>
         <HomeRoute
           exact
