@@ -146,7 +146,8 @@ class CustProfile extends Component {
               label="Name"
               inputProps={{
                 autoComplete:"off",
-                pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$"
+                pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$",
+                title:"Name can only contains a-z,A-Z, and space between!"
               }}
               margin="normal"
               onChange={this.handleChange}

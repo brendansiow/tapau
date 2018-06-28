@@ -147,7 +147,8 @@ class RestProfile extends Component {
               margin="normal"
               inputProps={{
                 autoComplete:"off",
-                pattern:"[^-\\s][a-zA-Z0-9-\\s]+[a-zA-Z0-9-]+$"
+                pattern:"[^-\\s][a-zA-Z0-9-\\s]+[a-zA-Z0-9-]+$",
+                title:"Restaurant name can only contains a-z,A-Z, and space between!"
               }}
               onChange={this.handleChange}
               value={this.state.name}
@@ -176,7 +177,9 @@ class RestProfile extends Component {
               fullWidth
               inputProps={{
                 autoComplete:"off",
-                pattern:"[^-\\s][0-9-]+$"
+                pattern:"[^-\\s][0-9-]+$",
+                title:"Contact number can only contains 0-9,- and +!"
+
               }}
               onChange={this.handleChange}
               value={this.state.contactno}

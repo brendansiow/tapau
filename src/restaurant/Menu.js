@@ -324,7 +324,8 @@ class Menu extends Component {
                 id="createmenu"
                 inputProps={{
                   autoComplete:"off",
-                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$"
+                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$",
+                  title:"Menu name can only contains a-z,A-Z, and space between!"
                 }}
                 label="Menu Name"
                 onChange={this.handleChange}
@@ -361,7 +362,8 @@ class Menu extends Component {
                 label="Food Name"
                 inputProps={{
                   autoComplete:"off",
-                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$"
+                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$",
+                  title:"Food name can only contains a-z,A-Z, and space between!"
                 }}
                 onChange={this.handleChange}
                 value={this.state.foodname}
