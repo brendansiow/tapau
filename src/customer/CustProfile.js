@@ -170,6 +170,8 @@ class CustProfile extends Component {
             </Button>
           </CardActions>
           </form>
+          </Card>
+          <Card  style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
           <form onSubmit={this.changePassword }>
           <CardContent>
             <h2 style={{ margin: "0px", textAlign: "center" }}>

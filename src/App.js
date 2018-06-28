@@ -46,7 +46,7 @@ class App extends Component {
       token: "",
       notification: [],
       anchorEl: null,
-      seen:true
+      seen: true
     };
   }
   componentDidMount() {
@@ -61,56 +61,71 @@ class App extends Component {
               user["name"] = doc.data().name;
               user["accounttype"] = doc.data().accounttype;
               //get and set fcm token
-              const msg = firebase.messaging();
-              msg
-                .requestPermission()
-                .then(() => {
-                  console.log("have permission");
-                  return msg.getToken();
-                })
-                .then(token => {
-                  this.setState({
-                    token: token
-                  });
-                  //update this device token to current logged in user
-                  var tokenupdate = doc.data().notiToken;
-                  if (tokenupdate) {
-                    if (!(tokenupdate.indexOf(token) > -1)) {
+              if ("Notification" in window) {
+                const msg = firebase.messaging();
+                msg
+                  .requestPermission()
+                  .then(() => {
+                    console.log("have permission");
+                    return msg.getToken();
+                  })
+                  .then(token => {
+                    this.setState({
+                      token: token
+                    });
+                    //update this device token to current logged in user
+                    var tokenupdate = doc.data().notiToken;
+                    if (tokenupdate) {
+                      if (!(tokenupdate.indexOf(token) > -1)) {
+                        tokenupdate.push(token);
+                      }
+                    } else {
+                      tokenupdate = [];
                       tokenupdate.push(token);
                     }
-                  } else {
-                    tokenupdate = [];
-                    tokenupdate.push(token);
-                  }
-                  db.collection("user")
-                    .doc(doc.id)
-                    .update({
-                      notiToken: tokenupdate
-                    });
-                  //delete this device token to all of the existing users
-                  db.collection("user")
-                    .get()
-                    .then(allusers => {
-                      allusers.forEach(eachuser => {
-                        var notiTokenarr = eachuser.data().notiToken;
-                        if (notiTokenarr && eachuser.data().uid !== user.uid) {
-                          var index = notiTokenarr.indexOf(token);
-                          if (index !== -1) {
-                            notiTokenarr.splice(index, 1);
-                            console.log(notiTokenarr);
-                          }
-                          db.collection("user")
-                            .doc(eachuser.id)
-                            .update({
-                              notiToken: notiTokenarr
-                            });
-                        }
+                    db.collection("user")
+                      .doc(doc.id)
+                      .update({
+                        notiToken: tokenupdate
                       });
-                    });
-                })
-                .catch(err => {
-                  console.log(err);
+                    //delete this device token to all of the existing users
+                    db.collection("user")
+                      .get()
+                      .then(allusers => {
+                        allusers.forEach(eachuser => {
+                          var notiTokenarr = eachuser.data().notiToken;
+                          if (
+                            notiTokenarr &&
+                            eachuser.data().uid !== user.uid
+                          ) {
+                            var index = notiTokenarr.indexOf(token);
+                            if (index !== -1) {
+                              notiTokenarr.splice(index, 1);
+                            }
+                            db.collection("user")
+                              .doc(eachuser.id)
+                              .update({
+                                notiToken: notiTokenarr
+                              });
+                          }
+                        });
+                      });
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
+              } else {
+                this.setState({
+                  notification: [{
+                    title: "Your browser does not support Web Notification !",
+                    body:"You will not receive any notification from now.",
+                    click_action:"https://tapau.tk"
+                  }],
+                  snackbarIsOpen: true,
+                  snackBarMsg: "Web notification not supported!",
+                  seen: false
                 });
+              }
             });
             //if user is a restaurant owner, get restaurant id
             if (user["accounttype"] === "restaurant") {
@@ -145,18 +160,20 @@ class App extends Component {
         this.props.history.push("/");
       }
     });
-    const msg = firebase.messaging();
-    msg.onMessage(payload => {
-      console.log(payload);
-      let notiarr = this.state.notification;
-      notiarr.unshift(payload.notification);
-      this.setState({
-        notification: notiarr,
-        snackbarIsOpen: true,
-        snackBarMsg: payload.notification.title,
-        seen:false,
+    if ("Notification" in window) {
+      const msg = firebase.messaging();
+      msg.onMessage(payload => {
+        console.log(payload);
+        let notiarr = this.state.notification;
+        notiarr.unshift(payload.notification);
+        this.setState({
+          notification: notiarr,
+          snackbarIsOpen: true,
+          snackBarMsg: payload.notification.title,
+          seen: false
+        });
       });
-    });
+    }
   }
   componentWillReceiveProps(props) {
     this.unblock = this.props.history.block((location, action) => {
@@ -228,7 +245,7 @@ class App extends Component {
       });
   };
   handleOpenNoti = event => {
-    this.setState({ anchorEl: event.currentTarget, seen:true });
+    this.setState({ anchorEl: event.currentTarget, seen: true });
   };
   handleClose = () => {
     this.setState({ anchorEl: null });
@@ -400,138 +417,129 @@ class App extends Component {
           disableBackdropTransition={!iOS}
           disableDiscovery={iOS}
         >
-          <List style={{backgroundColor: "#ef5350"}}>
-          <ListItem>
-          <ListItemText
-            style={{ color: "white", fontSize: "23px" }}
-            primary="Welcome to Tapau"
-            disableTypography
-          />
-        </ListItem>
+          <List style={{ backgroundColor: "#ef5350" }}>
+            <ListItem>
+              <ListItemText
+                style={{ color: "white", fontSize: "23px" }}
+                primary="Welcome to Tapau"
+                disableTypography
+              />
+            </ListItem>
           </List>
-            <List
+          <List
             onClick={() => this.setState({ open: false })}
-              onKeyDown={() => this.setState({ open: false })}
-              style={{ outline: "none"}}
-            >
-              {!this.state.loginuser ? (
-                <Link to="/" style={{ textDecoration: "none" }}>
-                  <ListItem button>
-                    <ListItemText
-                      style={{ color: "black", fontSize: "20px" }}
-                      primary="Login/Sign Up"
-                      disableTypography
-                    />
-                  </ListItem>
-                </Link>
-              ) : (
-                [
-                  this.state.loginuser.accounttype === "customer" ? (
-                    <div key="customer">
-                      <Link to="/" style={{ textDecoration: "none" }}>
-                        <ListItem button>
-                          <ListItemText
-                            style={{ color: "black", fontSize: "20px" }}
-                            primary="Home"
-                            disableTypography
-                          />
-                        </ListItem>
-                      </Link>
-                      <Link
-                        to="/cust/mytapau"
-                        style={{ textDecoration: "none" }}
-                      >
-                        <ListItem button>
-                          <ListItemText
-                            style={{ color: "black", fontSize: "20px" }}
-                            primary="My Tapau"
-                            disableTypography
-                          />
-                        </ListItem>
-                      </Link>
-                      <Link
-                        to="/cust/myprofile"
-                        style={{ textDecoration: "none" }}
-                      >
-                        <ListItem button>
-                          <ListItemText
-                            style={{ color: "black", fontSize: "20px" }}
-                            primary="My Profile"
-                            disableTypography
-                          />
-                        </ListItem>
-                      </Link>
-                    </div>
-                  ) : (
-                    <div key="restaurant">
-                      <Link to="/" style={{ textDecoration: "none" }}>
-                        <ListItem button>
-                          <ListItemText
-                            style={{ color: "black", fontSize: "20px" }}
-                            primary="Home"
-                            disableTypography
-                          />
-                        </ListItem>
-                      </Link>
-                      <Link
-                        to="/rest/myorder"
-                        style={{ textDecoration: "none" }}
-                      >
-                        <ListItem button>
-                          <ListItemText
-                            style={{ color: "black", fontSize: "20px" }}
-                            primary="My Order"
-                            disableTypography
-                          />
-                        </ListItem>
-                      </Link>
-                      <Link
-                        to="/rest/mymenu"
-                        style={{ textDecoration: "none" }}
-                      >
-                        <ListItem button>
-                          <ListItemText
-                            style={{ color: "black", fontSize: "20px" }}
-                            primary="My Menu"
-                            disableTypography
-                          />
-                        </ListItem>
-                      </Link>
-                      <Link
-                        to="/rest/myrestaurant"
-                        style={{ textDecoration: "none" }}
-                      >
-                        <ListItem button>
-                          <ListItemText
-                            style={{ color: "black", fontSize: "20px" }}
-                            primary="My Restaurant"
-                            disableTypography
-                          />
-                        </ListItem>
-                      </Link>
-                    </div>
-                  )
-                ]
-              )}
-              <Link to="/about" style={{ textDecoration: "none" }}>
+            onKeyDown={() => this.setState({ open: false })}
+            style={{ outline: "none" }}
+          >
+            {!this.state.loginuser ? (
+              <Link to="/" style={{ textDecoration: "none" }}>
                 <ListItem button>
                   <ListItemText
                     style={{ color: "black", fontSize: "20px" }}
-                    primary="About"
+                    primary="Login/Sign Up"
                     disableTypography
                   />
                 </ListItem>
               </Link>
-              {this.state.loginuser && (
-                <ListItem button onClick={this.handleLogout}>
-                  <ListItemText
-                    style={{ color: "black", fontSize: "20px" }}
-                    primary="Logout"
-                    disableTypography
-                  />
-                </ListItem>
-              )}
-            </List>
+            ) : (
+              [
+                this.state.loginuser.accounttype === "customer" ? (
+                  <div key="customer">
+                    <Link to="/" style={{ textDecoration: "none" }}>
+                      <ListItem button>
+                        <ListItemText
+                          style={{ color: "black", fontSize: "20px" }}
+                          primary="Home"
+                          disableTypography
+                        />
+                      </ListItem>
+                    </Link>
+                    <Link to="/cust/mytapau" style={{ textDecoration: "none" }}>
+                      <ListItem button>
+                        <ListItemText
+                          style={{ color: "black", fontSize: "20px" }}
+                          primary="My Tapau"
+                          disableTypography
+                        />
+                      </ListItem>
+                    </Link>
+                    <Link
+                      to="/cust/myprofile"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <ListItem button>
+                        <ListItemText
+                          style={{ color: "black", fontSize: "20px" }}
+                          primary="My Profile"
+                          disableTypography
+                        />
+                      </ListItem>
+                    </Link>
+                  </div>
+                ) : (
+                  <div key="restaurant">
+                    <Link to="/" style={{ textDecoration: "none" }}>
+                      <ListItem button>
+                        <ListItemText
+                          style={{ color: "black", fontSize: "20px" }}
+                          primary="Home"
+                          disableTypography
+                        />
+                      </ListItem>
+                    </Link>
+                    <Link to="/rest/myorder" style={{ textDecoration: "none" }}>
+                      <ListItem button>
+                        <ListItemText
+                          style={{ color: "black", fontSize: "20px" }}
+                          primary="My Order"
+                          disableTypography
+                        />
+                      </ListItem>
+                    </Link>
+                    <Link to="/rest/mymenu" style={{ textDecoration: "none" }}>
+                      <ListItem button>
+                        <ListItemText
+                          style={{ color: "black", fontSize: "20px" }}
+                          primary="My Menu"
+                          disableTypography
+                        />
+                      </ListItem>
+                    </Link>
+                    <Link
+                      to="/rest/myrestaurant"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <ListItem button>
+                        <ListItemText
+                          style={{ color: "black", fontSize: "20px" }}
+                          primary="My Restaurant"
+                          disableTypography
+                        />
+                      </ListItem>
+                    </Link>
+                  </div>
+                )
+              ]
+            )}
+            <Link to="/about" style={{ textDecoration: "none" }}>
+              <ListItem button>
+                <ListItemText
+                  style={{ color: "black", fontSize: "20px" }}
+                  primary="About"
+                  disableTypography
+                />
+              </ListItem>
+            </Link>
+            {this.state.loginuser && (
+              <ListItem button onClick={this.handleLogout}>
+                <ListItemText
+                  style={{ color: "black", fontSize: "20px" }}
+                  primary="Logout"
+                  disableTypography
+                />
+              </ListItem>
+            )}
+          </List>
         </SwipeableDrawer>
         <HomeRoute
           exact

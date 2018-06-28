@@ -55,7 +55,7 @@ class RestProfile extends Component {
       snackbarIsOpen: false
     });
   };
-  handleUpdate = (e) => {
+  handleUpdate = e => {
     e.preventDefault();
     db.collection("restaurant")
       .doc(this.props.loginuser.restaurant)
@@ -135,82 +135,84 @@ class RestProfile extends Component {
     return (
       <div style={{ paddingTop: "60px" }}>
         <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
-        <form onSubmit={this.handleUpdate}>
-          <CardContent>
-            <h2 style={{ margin: "0px", textAlign: "center" }}>
-              My Restaurant Profile
-            </h2>
-            <TextField
-              id="name"
-              type="text"
-              label="Restaurant Name"
-              margin="normal"
-              inputProps={{
-                autoComplete:"off",
-                pattern:"[^-\\s][a-zA-Z0-9-\\s]+[a-zA-Z0-9-]+$",
-                title:"Restaurant name can only contains a-z,A-Z, and space between!"
-              }}
-              onChange={this.handleChange}
-              value={this.state.name}
-              required
-              fullWidth
-            />
-            <TextField
-              id="address"
-              type="text"
-              label="Address"
-              margin="normal"
-              rows="3"
-              multiline
-              inputProps={{
-                autoComplete:"off"
-              }}
-              onChange={this.handleChange}
-              value={this.state.address}
-              required
-              fullWidth
-            />
-            <TextField
-              id="contactno"
-              label="Contact Number"
-              margin="normal"
-              fullWidth
-              inputProps={{
-                autoComplete:"off",
-                pattern:"[^-\\s][0-9-]+$",
-                title:"Contact number can only contains 0-9,- and +!"
-
-              }}
-              onChange={this.handleChange}
-              value={this.state.contactno}
-              required
-            />
-            <TextField
-              id="website"
-              label="Website / Facebook Page"
-              margin="normal"
-              type="url"
-              fullWidth
-              helperText="eg:https://tapau.tk"
-              onChange={this.handleChange}
-              value={this.state.website}
-              required
-            />
-          </CardContent>
-          <CardActions style={{ display: "flex", justifyContent: "center" }}>
-            <Button
-            type="submit"
-              variant="raised"
-              style={{
-                backgroundColor: "#EF5350",
-                color: "white",
-                margin: "10px 10px 0px 0px"
-              }}
-            >
-              Update
-            </Button>
-          </CardActions>
+          <form onSubmit={this.handleUpdate}>
+            <CardContent>
+              <h2 style={{ margin: "0px", textAlign: "center" }}>
+                My Restaurant Profile
+              </h2>
+              <TextField
+                id="name"
+                type="text"
+                label="Restaurant Name"
+                margin="normal"
+                inputProps={{
+                  autoComplete: "off",
+                  pattern: "[^-\\s][a-zA-Z0-9-\\s]+[a-zA-Z0-9-]+$",
+                  title:
+                    "Restaurant name can only contains a-z,A-Z, and space between!"
+                }}
+                onChange={this.handleChange}
+                value={this.state.name}
+                required
+                fullWidth
+              />
+              <TextField
+                id="address"
+                type="text"
+                label="Address"
+                margin="normal"
+                rows="3"
+                multiline
+                inputProps={{
+                  autoComplete: "off"
+                }}
+                onChange={this.handleChange}
+                value={this.state.address}
+                required
+                fullWidth
+              />
+              <TextField
+                id="contactno"
+                label="Contact Number"
+                margin="normal"
+                fullWidth
+                inputProps={{
+                  autoComplete: "off",
+                  pattern: "[^-\\s][0-9-]+$",
+                  title: "Contact number can only contains 0-9,- and +!"
+                }}
+                onChange={this.handleChange}
+                value={this.state.contactno}
+                required
+              />
+              <TextField
+                id="website"
+                label="Website / Facebook Page"
+                margin="normal"
+                type="url"
+                fullWidth
+                helperText="eg:https://tapau.tk"
+                onChange={this.handleChange}
+                value={this.state.website}
+                required
+              />
+            </CardContent>
+            <CardActions style={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                type="submit"
+                variant="raised"
+                style={{
+                  backgroundColor: "#EF5350",
+                  color: "white",
+                  margin: "10px 10px 0px 0px"
+                }}
+              >
+                Update
+              </Button>
+            </CardActions>
           </form>
+        </Card>
+        <Card style={{ marginTop: "10px", padding: "0px 20px 15px 20px" }}>
           <form onSubmit={this.changePassword}>
             <CardContent>
               <h2 style={{ margin: "0px", textAlign: "center" }}>

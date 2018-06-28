@@ -68,7 +68,10 @@ class Takeaway extends Component {
                       order.data().collectTime ||
                       !order.data().collectTime === ""
                     ) {
-                      activeStep = 4;
+                      activeStep = 4;       
+                      if(this.state.open){
+                        this.handleClose();
+                      }
                     } else if (
                       order.data().preparedTime ||
                       !order.data().preparedTime === ""
