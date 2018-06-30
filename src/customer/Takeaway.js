@@ -68,8 +68,8 @@ class Takeaway extends Component {
                       order.data().collectTime ||
                       !order.data().collectTime === ""
                     ) {
-                      activeStep = 4;       
-                      if(this.state.open){
+                      activeStep = 4;
+                      if (this.state.open) {
                         this.handleClose();
                       }
                     } else if (
@@ -147,14 +147,15 @@ class Takeaway extends Component {
             activeOrders: activeOrders,
             completedOrders: completedOrders
           });
+          let anchorElement = document.getElementById(this.state.activeOrder);
+          if (anchorElement) {
+            anchorElement.scrollIntoView({
+              block: "nearest",
+              behavior: "smooth"
+            });
+          }
         });
       });
-  }
-  componentDidUpdate() {
-    let anchorElement = document.getElementById(this.state.activeOrder);
-    if (anchorElement) {
-      anchorElement.scrollIntoView({ block: "center", behavior: "smooth" });
-    }
   }
   section = (label, order, index) => {
     switch (index) {

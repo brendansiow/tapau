@@ -28,7 +28,7 @@ class Register extends Component {
       address: "",
       contactno: "",
       website: "",
-      SignUp: false,
+      SignUp: false
     };
   }
   componentDidMount() {
@@ -53,8 +53,8 @@ class Register extends Component {
   handleRegister = e => {
     e.preventDefault();
     this.setState({
-        SignUp :true
-    })
+      SignUp: true
+    });
     firebase
       .auth()
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
@@ -75,40 +75,27 @@ class Register extends Component {
                   contactno: this.state.contactno,
                   website: this.state.website
                 })
-                .then(doc => {
-                  this.setState({
-                    snackBarMsg: "Sign up Successfully !!",
-                    snackBarBtn: "Okay !!",
-                    snackbarIsOpen: !this.state.snackbarIsOpen
-                  });
-                });
-            } else {
-              this.setState({
-                snackBarMsg: "Sign up Successfully !!",
-                snackBarBtn: "Okay !!",
-                snackbarIsOpen: !this.state.snackbarIsOpen
-              });
-            }
+              }
           });
       })
       .catch(error => {
         if (error.code === "auth/invalid-email") {
           this.setState({
-            SignUp :false,
+            SignUp: false,
             snackBarMsg: "Invalid email address !!",
             snackBarBtn: "Okay !!",
             snackbarIsOpen: !this.state.snackbarIsOpen
           });
         } else if (error.code === "auth/weak-password") {
           this.setState({
-            SignUp :false,
+            SignUp: false,
             snackBarMsg: "Weak password (> 6 characters)!",
             snackBarBtn: "Okay !!",
             snackbarIsOpen: !this.state.snackbarIsOpen
           });
         } else if (error.code === "auth/email-already-in-use") {
           this.setState({
-            SignUp :false,
+            SignUp: false,
             snackBarMsg: "Email already in used !",
             snackBarBtn: "Okay !!",
             snackbarIsOpen: !this.state.snackbarIsOpen
@@ -132,9 +119,9 @@ class Register extends Component {
                 type="text"
                 required
                 inputProps={{
-                  autoComplete:"off",
-                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$",
-                  title:"Name can only contains a-z,A-Z, and space between!"
+                  autoComplete: "off",
+                  pattern: "[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$",
+                  title: "Name can only contains a-z,A-Z, and space between!"
                 }}
                 onChange={this.handleChange}
                 value={this.state.name}
@@ -147,7 +134,7 @@ class Register extends Component {
                 type="email"
                 required
                 inputProps={{
-                  autoComplete:"off"
+                  autoComplete: "off"
                 }}
                 onChange={this.handleChange}
                 value={this.state.email}
@@ -191,9 +178,10 @@ class Register extends Component {
                     margin="normal"
                     required
                     inputProps={{
-                      autoComplete:"off",
-                      pattern:"[^-\\s][a-zA-Z0-9-\\s]+[a-zA-Z0-9-]+$",
-                      title:"Restaurant name can only contains a-z,A-Z,0-9,- and space between!"
+                      autoComplete: "off",
+                      pattern: "[^-\\s][a-zA-Z0-9-\\s]+[a-zA-Z0-9-]+$",
+                      title:
+                        "Restaurant name can only contains a-z,A-Z,0-9,- and space between!"
                     }}
                     onChange={this.handleChange}
                     value={this.state.restaurantname}
@@ -206,7 +194,7 @@ class Register extends Component {
                     required
                     multiline
                     inputProps={{
-                      autoComplete:"off"
+                      autoComplete: "off"
                     }}
                     rows="3"
                     onChange={this.handleChange}
@@ -219,9 +207,9 @@ class Register extends Component {
                     margin="normal"
                     required
                     inputProps={{
-                      autoComplete:"off",
-                      pattern:"[^-\\s][0-9-]+$",
-                      title:"Contact number can only contains 0-9,- and +!"
+                      autoComplete: "off",
+                      pattern: "[^-\\s][0-9-]+$",
+                      title: "Contact number can only contains 0-9,- and +!"
                     }}
                     fullWidth
                     onChange={this.handleChange}
@@ -236,7 +224,7 @@ class Register extends Component {
                     required
                     fullWidth
                     inputProps={{
-                      autoComplete:"off"
+                      autoComplete: "off"
                     }}
                     onChange={this.handleChange}
                     value={this.state.website}
@@ -288,9 +276,15 @@ class Register extends Component {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle style={{ textAlign: 'center' }}>Registering User...</DialogTitle>
-          <DialogContent style={{ textAlign: 'center' }}>
-            <CircularProgress style={{ color: '#ef5350' }} size={50} thickness={5} />
+          <DialogTitle style={{ textAlign: "center" }}>
+            Registering User...
+          </DialogTitle>
+          <DialogContent style={{ textAlign: "center" }}>
+            <CircularProgress
+              style={{ color: "#ef5350" }}
+              size={50}
+              thickness={5}
+            />
           </DialogContent>
         </Dialog>
       </div>

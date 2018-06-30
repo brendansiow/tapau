@@ -42,37 +42,40 @@ class Menu extends Component {
   }
   componentDidMount() {
     this.props.setTitle("My Menu");
-    db
-      .collection("menu")
-      .where("rid", "==", this.props.loginuser.restaurant)
-      .onSnapshot(menus => {
-        var menu = []; // capture each menu
-        menus.forEach(eachmenu => {
-          menu.push({
-            id: eachmenu.id,
-            menuname: eachmenu.data().menuname,
-            visibility: eachmenu.data().visibility,
-            foodlist: []
+    try {
+      db.collection("menu")
+        .where("rid", "==", this.props.loginuser.restaurant)
+        .onSnapshot(menus => {
+          var menu = []; // capture each menu
+          menus.forEach(eachmenu => {
+            menu.push({
+              id: eachmenu.id,
+              menuname: eachmenu.data().menuname,
+              visibility: eachmenu.data().visibility,
+              foodlist: []
+            });
           });
+          this.setState({ menu: menu });
         });
-        this.setState({ menu: menu });
-      });
 
-    db
-      .collection("food")
-      .where("rid", "==", this.props.loginuser.restaurant)
-      .onSnapshot(foods => {
-        var foodlist = [];
-        foods.forEach(food => {
-          foodlist.push({
-            foodid: food.id,
-            menuid: food.data().mid,
-            foodname: food.data().foodname,
-            foodprice: food.data().foodprice
+      db.collection("food")
+        .where("rid", "==", this.props.loginuser.restaurant)
+        .onSnapshot(foods => {
+          var foodlist = [];
+          foods.forEach(food => {
+            foodlist.push({
+              foodid: food.id,
+              menuid: food.data().mid,
+              foodname: food.data().foodname,
+              foodprice: food.data().foodprice
+            });
           });
+          this.setState({ foodlist: foodlist });
         });
-        this.setState({ foodlist: foodlist });
-      });
+    } catch (error) {
+      console.log(this.props.loginuser);
+      console.log(error);
+    }
   }
   handleChange = e => {
     if (e.target.id) {
@@ -136,8 +139,7 @@ class Menu extends Component {
   createMenu = e => {
     this.handleClose();
     e.preventDefault();
-    db
-      .collection("menu")
+    db.collection("menu")
       .add({
         rid: this.props.loginuser.restaurant,
         menuname: this.state.createmenu,
@@ -160,8 +162,7 @@ class Menu extends Component {
     var menu = this.state.menu;
     menu.forEach(doc => {
       if (doc.id === name) {
-        db
-          .collection("menu")
+        db.collection("menu")
           .doc(name)
           .update({
             visibility: !doc.visibility
@@ -188,8 +189,7 @@ class Menu extends Component {
     });
   };
   handleDelete = e => {
-    db
-      .collection("menu")
+    db.collection("menu")
       .doc(e)
       .delete()
       .then(() => {
@@ -206,8 +206,7 @@ class Menu extends Component {
   AddFood = e => {
     e.preventDefault();
     this.handleCloseFoodDialog();
-    db
-      .collection("food")
+    db.collection("food")
       .add({
         rid: this.props.loginuser.restaurant,
         mid: this.state.selectedMenu,
@@ -226,8 +225,7 @@ class Menu extends Component {
   };
   DeleteFood = () => {
     this.handleCloseDeleteFood();
-    db
-      .collection("food")
+    db.collection("food")
       .doc(this.state.selectedFoodDelete)
       .delete()
       .then(() => {
@@ -280,9 +278,17 @@ class Menu extends Component {
                 title={<h3 style={{ margin: "0" }}>{item.menuname}</h3>}
               />
               <CardContent style={{ paddingTop: "0px" }}>
-                <Button style={{ fontSize: "18px",textTransform:"none",color:"grey",padding:"0"}} onClick={this.openAddFoodDialog(item.id)}>
-                <Icon style={{ color: "#ef5350" }}>add</Icon>
-                Add Item
+                <Button
+                  style={{
+                    fontSize: "18px",
+                    textTransform: "none",
+                    color: "grey",
+                    padding: "0"
+                  }}
+                  onClick={this.openAddFoodDialog(item.id)}
+                >
+                  <Icon style={{ color: "#ef5350" }}>add</Icon>
+                  Add Item
                 </Button>
                 <List>
                   {this.state.foodlist.map(food => {
@@ -323,9 +329,10 @@ class Menu extends Component {
                 margin="dense"
                 id="createmenu"
                 inputProps={{
-                  autoComplete:"off",
-                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$",
-                  title:"Menu name can only contains a-z,A-Z, and space between!"
+                  autoComplete: "off",
+                  pattern: "[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$",
+                  title:
+                    "Menu name can only contains a-z,A-Z, and space between!"
                 }}
                 label="Menu Name"
                 onChange={this.handleChange}
@@ -361,9 +368,10 @@ class Menu extends Component {
                 id="foodname"
                 label="Food Name"
                 inputProps={{
-                  autoComplete:"off",
-                  pattern:"[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$",
-                  title:"Food name can only contains a-z,A-Z, and space between!"
+                  autoComplete: "off",
+                  pattern: "[^-\\s][a-zA-Z\\s]+[a-zA-Z]+$",
+                  title:
+                    "Food name can only contains a-z,A-Z, and space between!"
                 }}
                 onChange={this.handleChange}
                 value={this.state.foodname}

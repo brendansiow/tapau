@@ -112,7 +112,16 @@ class App extends Component {
                       });
                   })
                   .catch(err => {
-                    console.log(err);
+                    this.setState({
+                      notification: [{
+                        title: "You disable the web notification !",
+                        body:"Please enable it through your browser setting to receive notification from us again",
+                        click_action:"https://tapau.tk"
+                      }],
+                      snackbarIsOpen: true,
+                      snackBarMsg: "You disable the web notification!",
+                      seen: false
+                    });
                   });
               } else {
                 this.setState({

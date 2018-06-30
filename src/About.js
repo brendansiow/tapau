@@ -118,7 +118,7 @@ class About extends Component {
           by Tapau
         </h2>
         <Typography variant="caption" style={{ textAlign: "center",paddingBottom:"20px" }}>
-          Tapau v1.6
+          Tapau v1.7
         </Typography>
         <a href="https://github.com/walaoehh/tapau" style={{ display:"block", height:"32px", width:"32px",margin:"auto"}} >
         <span

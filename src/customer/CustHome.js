@@ -39,9 +39,9 @@ class CustHome extends Component {
             >
               <CardContent>
                 <Typography variant="title" style={{ marginTop: "10px" }}>{rest.name}</Typography>
-                <p>{rest.address}</p>
-                <p>Contact No: {rest.contactno}</p>
-                <p>Website: {rest.website}</p>
+                <p style={{color:"#505050"}}>{rest.address}</p>
+                <p style={{color:"#505050"}}>Contact No: {rest.contactno}</p>
+                <p style={{color:"#505050"}}>Website: {rest.website}</p>
               </CardContent>
               <CardActions
                 style={{ display: "flex", justifyContent: "flex-end" }}
